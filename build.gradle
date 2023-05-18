@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+}
+
+group = 'hu.rivalsnetwork.rivalstickets'
+version = file("version").readLines().get(0)
+
+repositories {
+    mavenCentral()
+
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    compileOnly("net.dv8tion:JDA:5.0.0-beta.9")
+    compileOnly("me.carleslc.Simple-YAML:Simple-Yaml:1.8.4")
+    compileOnly("org.apache.commons:commons-lang3:3.12.0")
+    implementation("org.mongodb:mongodb-driver-sync:4.9.1")
+}
+
+tasks.register('bumpBuildNumber') {
+    file("version").write("${file("version").readLines().get(0).toInteger() + 1}")
+}
+
+jar {
+    manifest {
+        attributes["Class-Path"] = "libs/JDA-5.0.0-beta.9-withDependencies-min.jar libs/Simple-Yaml-1.8.4.jar libs/commons-lang3-3.12.0.jar libs/mongodb-driver-sync-4.9.1.jar libs/mongodb-driver-core-4.9.1.jar libs/bson-4.9.1.jar"
+        attributes["Main-Class"] = "hu.rivalsnetwork.rivalstickets.Main"
+    }
+}
+
+tasks.jar {
+    archiveFileName.set("RivalsTickets-build-${version}.jar")
+}
+
+build {
+    bumpBuildNumber
+}

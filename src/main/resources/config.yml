@@ -1,0 +1,23 @@
+categories:
+  report-player:
+    haschild: true
+    categoryid: 1060952978615455804
+    child:
+      - "mute-player"
+    name: "Játékos jelentés"
+    id: "report"
+    emoji:
+      custom: true
+      animated: false
+      name: "fullpvp"
+      id: 952657488254218251
+  mute-player:
+    sub: true
+    categoryid: 1060952978615455804
+    name: "Játékos jelentés"
+    id: "mute-player"
+    emoji:
+      custom: true
+      animated: false
+      name: "fullpvp"
+      id: 952657488254218251
