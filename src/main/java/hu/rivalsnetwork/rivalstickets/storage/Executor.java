@@ -3,16 +3,24 @@ package hu.rivalsnetwork.rivalstickets.storage;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSBuckets;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
+import com.mongodb.client.model.UpdateOptions;
+import me.ryzeon.transcripts.DiscordHtmlTranscripts;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.*;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 public class Executor {
 
@@ -47,10 +55,13 @@ public class Executor {
         });
     }
 
-    public static void deleteTicket(@NotNull Member closer, @NotNull TextChannel channel) {
+    public static void deleteTicket(@NotNull Member closer, @NotNull TextChannel channel) throws IOException {
         if (!isTicket(channel)) return;
-        close(closer, channel);
-        channel.delete().queue();
+        DiscordHtmlTranscripts transcript = DiscordHtmlTranscripts.getInstance();
+        InputStream stream = transcript.generateFromMessages(channel.getIterableHistory().stream().collect(Collectors.toList()));
+
+        close(closer, channel, stream);
+        stream.close();
     }
 
     public static String getMemberIdByChannel(@NotNull TextChannel channel) {
@@ -156,7 +167,7 @@ public class Executor {
         });
     }
 
-    public static void close(@NotNull Member closer, @NotNull TextChannel channel) {
+    public static void close(@NotNull Member closer, @NotNull TextChannel channel, @NotNull InputStream stream) {
         Storage.mongo(database -> {
             MongoCollection<Document> collection = database.getCollection("rivals_tickets_tickets");
             Document search = new Document();
@@ -168,6 +179,30 @@ public class Executor {
             Document update = new Document();
             update.put("$set", document);
             collection.updateOne(search, update);
+
+            GridFSBucket bucket = GridFSBuckets.create(database, "rivals_tickets_tickets");
+
+            bucket.uploadFromStream(channel.getId(), stream);
+            Bson query = Filters.eq("channel_id", channel.getId());
+            collection.updateOne(
+                    query,
+                    new Document().append("$set", query),
+                    new UpdateOptions().upsert(true)
+            );
+
+            download(channel.getId());
+        });
+    }
+
+    public static void download(@NotNull String channelId) {
+        Storage.mongo(database -> {
+            GridFSBucket bucket = GridFSBuckets.create(database, "rivals_tickets_tickets");
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bucket.downloadToStream(channelId, stream);
+
+            try (OutputStream outputStream = new FileOutputStream(channelId + ".html")) {
+                stream.writeTo(outputStream);
+            } catch (Exception exception) {}
         });
     }
 }
