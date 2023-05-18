@@ -55,13 +55,16 @@ public class Executor {
         });
     }
 
-    public static void deleteTicket(@NotNull Member closer, @NotNull TextChannel channel) throws IOException {
+    public static void deleteTicket(@NotNull Member closer, @NotNull TextChannel channel, @NotNull String reason)  {
         if (!isTicket(channel)) return;
         DiscordHtmlTranscripts transcript = DiscordHtmlTranscripts.getInstance();
-        InputStream stream = transcript.generateFromMessages(channel.getIterableHistory().stream().collect(Collectors.toList()));
 
-        close(closer, channel, stream);
-        stream.close();
+        try (InputStream stream = transcript.generateFromMessages(channel.getIterableHistory().stream().collect(Collectors.toList()))) {
+            close(closer, channel, stream, reason);
+            channel.delete().queue();
+        } catch (Exception exception) {
+            System.getLogger("RivalsTickets").log(System.Logger.Level.ERROR, "There was an issue while getting inputstream for transcript!");
+        }
     }
 
     public static String getMemberIdByChannel(@NotNull TextChannel channel) {
@@ -162,12 +165,13 @@ public class Executor {
             document.put("transcript", new Document());
             document.put("closer", "");
             document.put("close-time", "");
+            document.put("close-reason", "");
 
             collection.insertOne(document);
         });
     }
 
-    public static void close(@NotNull Member closer, @NotNull TextChannel channel, @NotNull InputStream stream) {
+    public static void close(@NotNull Member closer, @NotNull TextChannel channel, @NotNull InputStream stream, @NotNull String reason) {
         Storage.mongo(database -> {
             MongoCollection<Document> collection = database.getCollection("rivals_tickets_tickets");
             Document search = new Document();
@@ -176,6 +180,7 @@ public class Executor {
             document.put("closed", true);
             document.put("closer", closer.getId());
             document.put("close-time", Date.from(Instant.now(Clock.system(ZoneId.of("Europe/Budapest")))));
+            document.put("close-reason", reason);
             Document update = new Document();
             update.put("$set", document);
             collection.updateOne(search, update);
@@ -189,8 +194,6 @@ public class Executor {
                     new Document().append("$set", query),
                     new UpdateOptions().upsert(true)
             );
-
-            download(channel.getId());
         });
     }
 
@@ -202,7 +205,7 @@ public class Executor {
 
             try (OutputStream outputStream = new FileOutputStream(channelId + ".html")) {
                 stream.writeTo(outputStream);
-            } catch (Exception exception) {}
+            } catch (Exception ignored) {}
         });
     }
 }

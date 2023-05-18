@@ -20,9 +20,8 @@ public class CloseButtonListener extends ListenerAdapter {
             return;
         }
 
-        TextInput userName = TextInput.create("reason", "Megoldva", TextInputStyle.SHORT)
+        TextInput userName = TextInput.create("reason", "Megoldva", TextInputStyle.PARAGRAPH)
                 .setValue("Megoldva")
-                .setRequiredRange(3, 16)
                 .setRequired(true)
                 .build();
 
