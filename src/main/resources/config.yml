@@ -1,6 +1,5 @@
 categories:
-  report-player:
-    haschild: true
+  report:
     categoryid: 1060952978615455804
     child:
       - "mute-player"
@@ -21,3 +20,43 @@ categories:
       animated: false
       name: "fullpvp"
       id: 952657488254218251
+
+embed:
+  close-server:
+    fields:
+      1:
+        title: "**Név:**"
+        content: "$name"
+        inline: true
+      2:
+        title: "**Csatorna ID:**"
+        content: "$channelId"
+        inline: true
+      3:
+        title: "**Bezáró:**"
+        content: "$closer"
+        inline: true
+      4:
+        title: "**Nyitó:**"
+        content: "$opener"
+        inline: true
+      5:
+        title: "**Kategória:**"
+        content: "$category"
+        inline: true
+      6:
+        title: "**Indok:**"
+        content: "$reason"
+        inline: true
+      7:
+        title: "**Játékosnév:**"
+        content: "$playerName"
+        inline: true
+      8:
+        title: "**Transcript:**"
+        content: "$url"
+        inline: true
+      9:
+        title: "**Nyitás/Zárás**"
+        content: "$open/$close"
+        inline: true

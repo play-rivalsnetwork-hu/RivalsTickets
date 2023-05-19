@@ -2,7 +2,9 @@ package hu.rivalsnetwork.rivalstickets.listeners;
 
 import hu.rivalsnetwork.rivalstickets.Main;
 import hu.rivalsnetwork.rivalstickets.configuration.Config;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -17,18 +19,15 @@ public class CreateStringReasonListener extends ListenerAdapter {
 
     @Override
     public void onStringSelectInteraction(@NotNull StringSelectInteractionEvent event) {
-        if (!event.getComponentId().equals("rivalstickets_reason_select")) {
-            return;
-        }
-        if (event.getMember() == null) {
-            return;
-        }
+        if (!event.getComponentId().equals("rivalstickets_reason_select")) return;
+        if (event.getMember() == null) return;
 
         String option = event.getSelectedOptions().get(0).getValue();
         ConfigurationSection categories = Config.CONFIG.getConfig().getConfigurationSection("categories");
         ConfigurationSection section = categories.getConfigurationSection(option);
 
-        if (!section.getBoolean("haschild", false)) {
+        if (section.getStringList("haschild") == null || section.getStringList("haschild").isEmpty()) {
+            event.getChannel().sendMessageEmbeds(finishEmbed()).addContent(Main.getGuild().getRoleById(Config.ROLE_TO_PING).getAsMention()).queue();
             event.getMessage().delete().queue();
             event.getChannel().asTextChannel().getManager().putMemberPermissionOverride(event.getUser().getIdLong(), EnumSet.of(Permission.MESSAGE_SEND), null).queue();
             event.getChannel().asTextChannel().getManager().setParent(Main.getGuild().getCategoryById(section.getString("categoryid"))).queue();
@@ -51,5 +50,14 @@ public class CreateStringReasonListener extends ListenerAdapter {
 
         event.getMessage().delete().queue();
         event.getChannel().sendMessageEmbeds(CreateModalListener.selectEmbed()).setActionRow(menu.build()).queue();
+    }
+
+    @NotNull
+    private static MessageEmbed finishEmbed() {
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setColor(Config.FINISH_COLOR);
+        builder.addField(new MessageEmbed.Field(Config.FINISH_TITLE, Config.FINISH_CONTENT, false));
+
+        return builder.build();
     }
 }

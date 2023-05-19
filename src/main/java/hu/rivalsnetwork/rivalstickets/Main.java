@@ -1,6 +1,7 @@
 package hu.rivalsnetwork.rivalstickets;
 
 import hu.rivalsnetwork.rivalstickets.commands.TicketEmbedCommand;
+import hu.rivalsnetwork.rivalstickets.commands.TicketRenameCommand;
 import hu.rivalsnetwork.rivalstickets.configuration.Config;
 import hu.rivalsnetwork.rivalstickets.listeners.*;
 import hu.rivalsnetwork.rivalstickets.storage.Storage;
@@ -9,6 +10,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.jetbrains.annotations.NotNull;
@@ -35,8 +37,8 @@ public class Main {
         new Storage();
 
         jda.upsertCommand("ticketembed", "Ticket embed message").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).queue();
-        jda.addEventListener(new TicketEmbedCommand(), new CreateButtonListener(), new CreateModalListener(), new CreateStringReasonListener(), new CloseButtonListener(), new CloseModalListener());
-
+        jda.upsertCommand("rename", "Rename ticket command").addOption(OptionType.STRING, "name", "A hibajegy új neve").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
+        jda.addEventListener(new TicketEmbedCommand(), new CreateButtonListener(), new CreateModalListener(), new CreateStringReasonListener(), new CloseButtonListener(), new CloseModalListener(), new MessageSendListener(), new TicketRenameCommand());
     }
 
     public static File getDataFolder() {

@@ -34,7 +34,7 @@ public class CreateModalListener extends ListenerAdapter {
             channel.getManager().putMemberPermissionOverride(event.getMember().getIdLong(), Permission.VIEW_CHANNEL.getRawValue(), Permission.MESSAGE_SEND.getRawValue()).queue();
             List<Button> list = new ArrayList<>();
             list.add(Button.primary("rivalstickets_close", Config.CLOSE_BUTTON_NAME).withStyle(ButtonStyle.DANGER));
-            channel.sendMessageEmbeds(closeEmbed(event.getMember(), event.getValue("username").getAsString())).addActionRow(list).queue();
+            channel.sendMessageEmbeds(closeEmbed(event.getMember(), event.getValue("username").getAsString())).addContent(event.getMember().getAsMention()).addActionRow(list).queue();
 
             StringSelectMenu.Builder menu = StringSelectMenu.create("rivalstickets_reason_select");
 
@@ -54,7 +54,7 @@ public class CreateModalListener extends ListenerAdapter {
                 menu.addOption(section1.getString("name"), section1.getString("id"), emoji2);
             }
 
-            Executor.createTicket(event.getMember(), channel, ticketId);
+            Executor.createTicket(event.getMember(), channel, ticketId, event.getValue("username").getAsString());
             channel.sendMessageEmbeds(selectEmbed()).addActionRow(menu.build()).queue();
             event.reply(Config.CHANNEL_CREATED.replace("$channelId", channel.getId())).setEphemeral(true).queue();
         });

@@ -45,7 +45,7 @@ public class Config extends AbstractConfig {
     Üdvözöllek, **<@$id>**
     A személyzet egy tagja hamarosan segít neked.
     **Kérlek, válaszd ki a kategóriát, amiben segíteni tudunk.**
-    
+    * *
     **Játékosnév: $username**
     """;
     @Key("embed.close.color")
@@ -62,6 +62,41 @@ public class Config extends AbstractConfig {
     public static String CHANNEL_CREATED = "Létrehozva a hibajegyed! <#$channelId>";
     @Key("ticket.cant-close")
     public static String CANT_CLOSE = "Csak staff zárhat le hibajegyet!";
+    @Key("ticket.dump.guildid")
+    public static String DUMP_GUILD_ID = "1064541123021901824";
+    @Key("ticket.dump.channelid")
+    public static String DUMP_CHANNEL_ID = "1109131200615944223";
+    @Key("embed.finish.field.title")
+    public static String FINISH_TITLE = "**Hibajegy**";
+    @Key("embed.finish.field.content")
+    public static String FINISH_CONTENT = """
+    Kérlek írd le a problémádat részletesen, hogy tudjunk segíteni!
+    """;
+    @Key("embed.finish.color")
+    public static int FINISH_COLOR = 0x00ff00;
+    @Key("settings.debug")
+    public static boolean DEBUG = true;
+    @Key("embed.close-dm.field.title")
+    public static String CLOSE_DM_TITLE = "\uD83C\uDFAB RivalsNetwork - Hibajegy";
+    @Key("embed.close-dm.field.content")
+    public static String CLOSE_DM_CONTENT = """
+    A hibajegyed lezárásra került $staff által!
+    \n
+    \n
+    Lezárás indoka: $reason
+    \n
+    Transcript: $url
+    """;
+    @Key("embed.close-dm.color")
+    public static int CLOSE_DM_COLOR = 0xffee00;
+    @Key("embed.close-server.color")
+    public static int CLOSE_SERVER_COLOR = 0x00ff00;
+    @Key("embed.close-server.title")
+    public static String CLOSE_SERVER_TITLE = "\uD83C\uDFAB Hibajegy bezárás";
+    @Key("ticket.close-transcript-channel-id")
+    public static String CLOSE_TRANSCRIPT_CHANNEL = "1109131200615944223";
+    @Key("ticket.role-to-ping")
+    public static String ROLE_TO_PING = "1064551010284097556";
 
     public static final Config CONFIG = new Config();
 
