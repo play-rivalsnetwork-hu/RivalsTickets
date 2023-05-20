@@ -45,7 +45,7 @@ public class Config extends AbstractConfig {
     Üdvözöllek, **<@$id>**
     A személyzet egy tagja hamarosan segít neked.
     **Kérlek, válaszd ki a kategóriát, amiben segíteni tudunk.**
-    * *
+    \n
     **Játékosnév: $username**
     """;
     @Key("embed.close.color")
@@ -97,6 +97,18 @@ public class Config extends AbstractConfig {
     public static String CLOSE_TRANSCRIPT_CHANNEL = "1109131200615944223";
     @Key("ticket.role-to-ping")
     public static String ROLE_TO_PING = "1064551010284097556";
+    @Key("embed.toplist.title")
+    public static String TOPLIST_TITLE = "**Bezárt hibajegy toplista**";
+    @Key("embed.toplist.field.title")
+    public static String TOPLIST_FIELD_TITLE = "$name";
+    @Key("embed.toplist.field.content")
+    public static String TOPLIST_FIELD_CONTENT = "#$position | $amount bezárt hibajegy";
+    @Key("embed.toplist.color")
+    public static int TOPLIST_COLOR = 0x00ff00;
+    @Key("embed.toplist.inline")
+    public static boolean TOPLIST_INLINE = true;
+    @Key("embed.toplist.footer")
+    public static String TOPLIST_FOOTER = "**Ekkortól: $date**";
 
     public static final Config CONFIG = new Config();
 

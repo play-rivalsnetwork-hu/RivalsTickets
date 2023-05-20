@@ -12,6 +12,7 @@ public class CloseModalListener extends ListenerAdapter {
         if (!event.getModalId().equals("ticket_close_reason")) return;
         if (event.getMember() == null) return;
 
+        event.reply("Hibajegy bezárása...").queue();
         Executor.deleteTicket(event.getMember(), event.getChannel().asTextChannel(), event.getValue("reason").getAsString());
     }
 }

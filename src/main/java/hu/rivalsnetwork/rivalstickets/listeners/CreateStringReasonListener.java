@@ -26,7 +26,7 @@ public class CreateStringReasonListener extends ListenerAdapter {
         ConfigurationSection categories = Config.CONFIG.getConfig().getConfigurationSection("categories");
         ConfigurationSection section = categories.getConfigurationSection(option);
 
-        if (section.getStringList("haschild") == null || section.getStringList("haschild").isEmpty()) {
+        if (section.getStringList("child") == null || section.getStringList("child").isEmpty()) {
             event.getChannel().sendMessageEmbeds(finishEmbed()).addContent(Main.getGuild().getRoleById(Config.ROLE_TO_PING).getAsMention()).queue();
             event.getMessage().delete().queue();
             event.getChannel().asTextChannel().getManager().putMemberPermissionOverride(event.getUser().getIdLong(), EnumSet.of(Permission.MESSAGE_SEND), null).queue();

@@ -16,7 +16,7 @@ import java.util.Collections;
 public class Storage {
     private static MongoClient client;
 
-    public Storage() {
+    public static void reload() {
         ServerAddress address = new ServerAddress(Config.ADDRESS, 27017);
         MongoCredential credential = MongoCredential.createCredential(Config.USERNAME, Config.DATABASE, Config.PASSWORD.toCharArray());
         MongoClientSettings settings = MongoClientSettings.builder()

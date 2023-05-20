@@ -2,6 +2,7 @@ package hu.rivalsnetwork.rivalstickets;
 
 import hu.rivalsnetwork.rivalstickets.commands.TicketEmbedCommand;
 import hu.rivalsnetwork.rivalstickets.commands.TicketRenameCommand;
+import hu.rivalsnetwork.rivalstickets.commands.TicketStaffInfoCommand;
 import hu.rivalsnetwork.rivalstickets.configuration.Config;
 import hu.rivalsnetwork.rivalstickets.listeners.*;
 import hu.rivalsnetwork.rivalstickets.storage.Storage;
@@ -34,11 +35,12 @@ public class Main {
         if (!dataFolder.exists()) dataFolder.mkdirs();
 
         Config.reload();
-        new Storage();
+        Storage.reload();
 
         jda.upsertCommand("ticketembed", "Ticket embed message").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).queue();
+        jda.upsertCommand("tickettoplist", "Staff info command").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).addOption(OptionType.INTEGER, "time", "Idő").queue();
         jda.upsertCommand("rename", "Rename ticket command").addOption(OptionType.STRING, "name", "A hibajegy új neve").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
-        jda.addEventListener(new TicketEmbedCommand(), new CreateButtonListener(), new CreateModalListener(), new CreateStringReasonListener(), new CloseButtonListener(), new CloseModalListener(), new MessageSendListener(), new TicketRenameCommand());
+        jda.addEventListener(new TicketEmbedCommand(), new CreateButtonListener(), new CreateModalListener(), new CreateStringReasonListener(), new CloseButtonListener(), new CloseModalListener(), new MessageSendListener(), new TicketRenameCommand(), new TicketStaffInfoCommand());
     }
 
     public static File getDataFolder() {
@@ -63,7 +65,8 @@ public class Main {
 
                 if (next.equalsIgnoreCase("reload")) {
                     Config.reload();
-                    System.out.println("Config újratöltve!");
+                    Storage.reload();
+                    System.out.println("Config & adatbázis újratöltve!");
                 } else if (next.equalsIgnoreCase("stop")) {
                     System.out.println("Bot leállítása");
                     jda.shutdown();

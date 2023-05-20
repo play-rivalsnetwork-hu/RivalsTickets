@@ -10,9 +10,11 @@ public class TicketRenameCommand extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!event.getName().equals("rename")) return;
+        if (event.getMember() == null) return;
 
         if (Executor.isTicket(event.getChannel().asTextChannel())) {
-            event.getChannel().asTextChannel().getManager().setName(event.getOption("name").getAsString()).queue();
+            event.getChannel().asTextChannel().getManager().setName(event.getOption("name") == null ? event.getMember().getEffectiveName() : event.getOption("name").getAsString()).queue();
+            event.reply("Átnevezve!").setEphemeral(true).queue();
         }
     }
 }
