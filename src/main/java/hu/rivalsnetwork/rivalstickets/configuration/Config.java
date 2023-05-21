@@ -109,6 +109,8 @@ public class Config extends AbstractConfig {
     public static boolean TOPLIST_INLINE = true;
     @Key("embed.toplist.footer")
     public static String TOPLIST_FOOTER = "**Ekkortól: $date**";
+    @Key("time-format")
+    public static String TIME_FORMAT = "<t:$epochSeconds>";
 
     public static final Config CONFIG = new Config();
 

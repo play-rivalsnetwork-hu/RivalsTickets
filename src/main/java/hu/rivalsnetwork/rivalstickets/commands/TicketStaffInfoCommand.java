@@ -16,12 +16,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Calendar;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public class TicketStaffInfoCommand extends ListenerAdapter {
@@ -47,32 +47,37 @@ public class TicketStaffInfoCommand extends ListenerAdapter {
                     String key = iterator.next().getString("closer-formatted-discord-name");
                     userMap.put(key, userMap.getOrDefault(key, 0) + 1);
                 }
+
+                staffInfoEmbed(sortByValue(userMap), event, secondDate);
             }
-
-            TreeMap<String, Integer> result = userMap.entrySet()
-                    .stream()
-                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            Map.Entry::getValue,
-                            (oldValue, newValue) -> oldValue, TreeMap::new));
-
-            staffInfoEmbed(result, event, secondDate);
         });
     }
 
-    private static void staffInfoEmbed(@NotNull TreeMap<String, Integer> map, SlashCommandInteractionEvent event, @NotNull Date date) {
+    private static void staffInfoEmbed(@NotNull HashMap<String, Integer> map, @NotNull SlashCommandInteractionEvent event, @NotNull Date date) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Config.TOPLIST_COLOR);
         builder.setTitle(Config.TOPLIST_TITLE);
         builder.setFooter(Config.TOPLIST_FOOTER.replace("$date", date.toString()));
-        int pos = 0;
+        int[] pos = {0};
 
-        for (Map.Entry<String, Integer> entry : map.entrySet()) {
-            pos++;
-            builder.addField(new MessageEmbed.Field(Config.TOPLIST_FIELD_TITLE.replace("$name", entry.getKey()).replace("$amount", entry.getValue().toString()).replace("$position", String.valueOf(pos)), Config.TOPLIST_FIELD_CONTENT.replace("$name", entry.getKey()).replace("$amount", entry.getValue().toString()).replace("$position", String.valueOf(pos)), Config.TOPLIST_INLINE));
-        }
+        map.forEach((key, value) -> {
+            pos[0]++;
+            builder.addField(new MessageEmbed.Field(Config.TOPLIST_FIELD_TITLE.replace("$name", key).replace("$amount", value.toString()).replace("$position", String.valueOf(pos[0])), Config.TOPLIST_FIELD_CONTENT.replace("$name", key).replace("$amount", value.toString()).replace("$position", String.valueOf(pos[0])), Config.TOPLIST_INLINE));
+        });
 
         event.replyEmbeds(builder.build()).queue();
+    }
+
+    // https://www.geeksforgeeks.org/sorting-a-hashmap-according-to-values/ && https://www.javacodegeeks.com/2017/09/java-8-sorting-hashmap-values-ascending-descending-order.html
+    public static HashMap<String, Integer> sortByValue(HashMap<String, Integer> hm) {
+        HashMap<String, Integer> temp = hm.entrySet()
+                .stream()
+                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e2, LinkedHashMap::new));
+
+        return temp;
     }
 }

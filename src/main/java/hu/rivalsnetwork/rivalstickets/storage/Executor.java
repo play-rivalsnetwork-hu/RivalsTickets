@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.ZoneId;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -114,8 +115,8 @@ public class Executor {
                                 .replace("$url", "https://tickets.rivalsnetwork.hu/" + next.getString("uuid"))
                                 .replace("$playerName", next.getString("username"))
                                 .replace("$opener", next.getString("owner-formatted-discord-name"))
-                                .replace("$open", next.get("open-time").toString())
-                                .replace("$close", next.get("close-time").toString())
+                                .replace("$open", Config.TIME_FORMAT.replace ("$epochSeconds", String.valueOf(((Date) next.get("open-time")).toInstant().getEpochSecond())))
+                                .replace("$close", Config.TIME_FORMAT.replace ("$epochSeconds", String.valueOf(((Date) next.get("close-time")).toInstant().getEpochSecond())))
                                 .replace("$id", next.getInteger("_id").toString()), subSection.getBoolean("inline")));
                     }
                 }
@@ -284,7 +285,7 @@ public class Executor {
             FindIterable<Document> cursor = collection.find(search);
             try (final MongoCursor<Document> iterator = cursor.cursor()) {
                 if (iterator.hasNext()) {
-                    url[0] = "https://tickets.rivalsnetwork.hu/" + iterator.next().getString("uuid");
+                    url[0] = "[A transcript megtekintéséhez kattints ide!](https://tickets.rivalsnetwork.hu/" + iterator.next().getString("uuid") + ")";
                 }
             }
         });

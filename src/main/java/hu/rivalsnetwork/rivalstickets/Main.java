@@ -14,11 +14,14 @@ import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import okhttp3.OkHttpClient;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.EnumSet;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Main {
     private static File dataFolder;
@@ -37,6 +40,7 @@ public class Main {
         Config.reload();
         Storage.reload();
 
+        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
         jda.upsertCommand("ticketembed", "Ticket embed message").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).queue();
         jda.upsertCommand("tickettoplist", "Staff info command").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).addOption(OptionType.INTEGER, "time", "Idő").queue();
         jda.upsertCommand("rename", "Rename ticket command").addOption(OptionType.STRING, "name", "A hibajegy új neve").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
