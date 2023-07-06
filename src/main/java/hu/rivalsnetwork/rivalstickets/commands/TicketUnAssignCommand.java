@@ -12,7 +12,7 @@ public class TicketUnAssignCommand extends ListenerAdapter {
         if (!event.getName().equals("unassign")) return;
         OptionMapping mapping = event.getOption("assignee");
         if (mapping == null) return;
-        event.deferReply().queue();
+        event.deferReply(true).queue();
 
         if (Executor.isTicket(event.getChannel().asTextChannel())) {
             Executor.removeAssignee(event.getChannel(), mapping.getAsMember());

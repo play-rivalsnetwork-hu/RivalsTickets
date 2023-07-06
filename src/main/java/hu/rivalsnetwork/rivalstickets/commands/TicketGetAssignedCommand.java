@@ -13,7 +13,7 @@ public class TicketGetAssignedCommand extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         if (!event.getName().equals("getassignee")) return;
-        event.deferReply().queue();
+        event.deferReply(true).queue();
 
         if (Executor.isTicket(event.getChannel().asTextChannel())) {
             List<Member> assignees = Executor.getAssignedTo(event.getChannel());
