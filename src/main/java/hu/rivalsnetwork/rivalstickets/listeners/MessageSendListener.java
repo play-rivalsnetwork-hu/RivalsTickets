@@ -33,39 +33,41 @@ public class MessageSendListener extends ListenerAdapter {
         int[] asd = {0};
 
         wh.queue(webhook -> {
-            WebhookClient client = WebhookClient.withUrl(webhook.getUrl());
-            WebhookMessageBuilder builder = new WebhookMessageBuilder();
-            builder.setUsername(event.getAuthor().getName()).setAvatarUrl(event.getAuthor().getAvatarUrl());
+            try {
+                WebhookClient client = WebhookClient.withUrl(webhook.getUrl());
+                WebhookMessageBuilder builder = new WebhookMessageBuilder();
+                builder.setUsername(event.getAuthor().getName()).setAvatarUrl(event.getAuthor().getAvatarUrl());
 
-            List<Message.Attachment> attachmentList = event.getMessage().getAttachments();
-            AtomicReference<List<Message.Attachment>> secondAttachmentList = new AtomicReference<>();
+                List<Message.Attachment> attachmentList = event.getMessage().getAttachments();
+                AtomicReference<List<Message.Attachment>> secondAttachmentList = new AtomicReference<>();
 
-            for (Message.Attachment attachment : attachmentList) {
-                attachment.getProxy().download().thenAccept(stream -> {
-                    int[] amount = {0};
-                    Main.getJDA().getGuildById(Config.DUMP_GUILD_ID).getTextChannelById(Config.DUMP_CHANNEL_ID).sendFiles(FileUpload.fromData(stream, attachment.getFileName())).queue(message -> {
-                        secondAttachmentList.set(message.getAttachments());
-                        for (Message.Attachment messageAttachment : secondAttachmentList.get()) {
-                            messageAttachment.getProxy().download().thenAccept(data -> {
-                                amount[0]++;
-                                builder.addFile(messageAttachment.getFileName(), data);
+                for (Message.Attachment attachment : attachmentList) {
+                    attachment.getProxy().download().thenAccept(stream -> {
+                        int[] amount = {0};
+                        Main.getJDA().getGuildById(Config.DUMP_GUILD_ID).getTextChannelById(Config.DUMP_CHANNEL_ID).sendFiles(FileUpload.fromData(stream, attachment.getFileName())).queue(message -> {
+                            secondAttachmentList.set(message.getAttachments());
+                            for (Message.Attachment messageAttachment : secondAttachmentList.get()) {
+                                messageAttachment.getProxy().download().thenAccept(data -> {
+                                    amount[0]++;
+                                    builder.addFile(messageAttachment.getFileName(), data);
 
-                                if (amount[0] == secondAttachmentList.get().size()) {
-                                    asd[0]++;
-                                }
-                            }).thenAccept(webhook2 -> {
-                                if (attachmentList.size() == amount[0] && asd[0] == secondAttachmentList.get().size()) {
-                                    builder.setContent(fmessage);
-                                    client.send(builder.build());
-                                    client.close();
-                                    event.getMessage().delete().queue();
-                                    ch.deleteWebhookById(webhook.getId()).queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_WEBHOOK));
-                                }
-                            });
-                        }
+                                    if (amount[0] == secondAttachmentList.get().size()) {
+                                        asd[0]++;
+                                    }
+                                }).thenAccept(webhook2 -> {
+                                    if (attachmentList.size() == amount[0] && asd[0] == secondAttachmentList.get().size()) {
+                                        builder.setContent(fmessage);
+                                        client.send(builder.build());
+                                        client.close();
+                                        event.getMessage().delete().queue();
+                                        ch.deleteWebhookById(webhook.getId()).queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_WEBHOOK));
+                                    }
+                                });
+                            }
+                        });
                     });
-                });
-            }
+                }
+            } catch (Exception e) {}
         });
     }
 }

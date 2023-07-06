@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("net.dv8tion:JDA:5.0.0-beta.9")
+    compileOnly("net.dv8tion:JDA:5.0.0-beta.12")
     compileOnly("me.carleslc.Simple-YAML:Simple-Yaml:1.8.4")
     compileOnly("org.apache.commons:commons-lang3:3.12.0")
     compileOnly("org.mongodb:mongodb-driver-sync:4.9.1")
@@ -27,7 +27,7 @@ tasks.register('bumpBuildNumber') {
 
 jar {
     manifest {
-        attributes["Class-Path"] = "libs/JDA-5.0.0-beta.9-withDependencies-min.jar libs/Simple-Yaml-1.8.4.jar libs/commons-lang3-3.12.0.jar libs/mongodb-driver-sync-4.9.1.jar libs/mongodb-driver-core-4.9.1.jar libs/bson-4.9.1.jar libs/discord-html-transcripts-1e7773b5b1.jar libs/jsoup-1.14.3.jar libs/discord-webhooks-0.8.2.jar libs/json-20210307.jar"
+        attributes["Class-Path"] = "libs/JDA-5.0.0-beta.12-withDependencies-min.jar libs/Simple-Yaml-1.8.4.jar libs/commons-lang3-3.12.0.jar libs/mongodb-driver-sync-4.9.1.jar libs/mongodb-driver-core-4.9.1.jar libs/bson-4.9.1.jar libs/discord-html-transcripts-1e7773b5b1.jar libs/jsoup-1.14.3.jar libs/discord-webhooks-0.8.2.jar libs/json-20210307.jar"
         attributes["Main-Class"] = "hu.rivalsnetwork.rivalstickets.Main"
     }
 }

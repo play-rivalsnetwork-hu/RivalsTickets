@@ -108,7 +108,7 @@ public class Executor {
                         ConfigurationSection subSection = section.getConfigurationSection(key);
                         builder.addField(new MessageEmbed.Field(subSection.getString("title"), subSection.getString("content")
                                 .replace("$reason", reason)
-                                .replace("$closer", closer.getUser().getName() + "#" + closer.getUser().getDiscriminator())
+                                .replace("$closer", closer.getUser().getName())
                                 .replace("$name", channel.getName())
                                 .replace("$category", channel.getParentCategory() == null ? "---" : channel.getParentCategory().getName())
                                 .replace("$channelId", channel.getId())
@@ -169,7 +169,10 @@ public class Executor {
             FindIterable<Document> cursor = collection.find(find);
             try (final MongoCursor<Document> iterator = cursor.cursor()) {
                 while (iterator.hasNext()) {
-                    if (iterator.next().getBoolean("closed")) continue;
+                    Document next = iterator.next();
+                    if (next.getBoolean("closed")) continue;
+                    TextChannel channel = Main.getGuild().getTextChannelById(next.getString("channel_id"));
+                    if (channel == null) continue;
 
                     hasTicket[0] = true;
                     break;
@@ -219,7 +222,7 @@ public class Executor {
             Document document = new Document();
             document.put("channel_id", channel.getId());
             document.put("owner", member.getId());
-            document.put("owner-formatted-discord-name", member.getUser().getName() + "#" + member.getUser().getDiscriminator());
+            document.put("owner-formatted-discord-name", member.getUser().getName());
             document.put("username", userName);
             document.put("open-time", Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Europe/Budapest"))).getTime());
             document.put("_id", id);
@@ -243,7 +246,7 @@ public class Executor {
             document.put("closer", closer.getId());
             document.put("close-time", Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Europe/Budapest"))).getTime());
             document.put("close-reason", reason);
-            document.put("closer-formatted-discord-name", closer.getUser().getName() + "#" + closer.getUser().getDiscriminator());
+            document.put("closer-formatted-discord-name", closer.getUser().getName());
             Document update = new Document();
             update.put("$set", document);
             collection.updateOne(search, update);
@@ -297,7 +300,7 @@ public class Executor {
     private static MessageEmbed closeEmbed(@NotNull Member closer, @NotNull String reason, @NotNull TextChannel channel) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Config.CLOSE_DM_COLOR);
-        builder.addField(new MessageEmbed.Field(Config.CLOSE_DM_TITLE, Config.CLOSE_DM_CONTENT.replace("$url", getURL(channel)).replace("$reason", reason).replace("$staff", closer.getUser().getName() + "#" + closer.getUser().getDiscriminator()), false));
+        builder.addField(new MessageEmbed.Field(Config.CLOSE_DM_TITLE, Config.CLOSE_DM_CONTENT.replace("$url", getURL(channel)).replace("$reason", reason).replace("$staff", closer.getUser().getName()), false));
 
         return builder.build();
     }
