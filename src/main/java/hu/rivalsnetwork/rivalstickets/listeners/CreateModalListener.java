@@ -32,6 +32,7 @@ public class CreateModalListener extends ListenerAdapter {
         category.createTextChannel(Config.NAME_PATTERN.replace("$id", String.valueOf(ticketId))).addRolePermissionOverride(Config.DEFAULT_GROUP_ID, null, EnumSet.of(Permission.VIEW_CHANNEL)).addMemberPermissionOverride(event.getMember().getIdLong(), Permission.VIEW_CHANNEL.getRawValue(), Permission.MESSAGE_SEND.getRawValue()).queue(channel -> {
             List<Button> list = new ArrayList<>();
             list.add(Button.primary("rivalstickets_close", Config.CLOSE_BUTTON_NAME).withStyle(ButtonStyle.DANGER));
+            list.add(Button.primary("rivalstickets_assign", Config.ASSIGN_BUTTON_NAME).withStyle(ButtonStyle.PRIMARY));
             channel.sendMessageEmbeds(closeEmbed(event.getMember(), event.getValue("username").getAsString())).addContent(event.getMember().getAsMention()).addActionRow(list).queue();
 
             StringSelectMenu.Builder menu = StringSelectMenu.create("rivalstickets_reason_select");

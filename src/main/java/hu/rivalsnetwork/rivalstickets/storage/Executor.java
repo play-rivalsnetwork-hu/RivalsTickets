@@ -12,15 +12,18 @@ import hu.rivalsnetwork.rivalstickets.Main;
 import hu.rivalsnetwork.rivalstickets.configuration.Config;
 import me.ryzeon.transcripts.DiscordHtmlTranscripts;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.simpleyaml.configuration.ConfigurationSection;
 
 import java.io.ByteArrayOutputStream;
@@ -28,8 +31,10 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -294,6 +299,86 @@ public class Executor {
         });
 
         return url[0];
+    }
+
+    public static void assignTo(@NotNull Channel channel, @Nullable Member member) {
+        if (member == null) return;
+        List<Member> assignees = getAssignedTo(channel);
+        assignees.add(member);
+        List<String> assigneeIds = assignees.stream().map(ISnowflake::getId).toList();
+
+        Storage.mongo(database -> {
+            MongoCollection<Document> collection = database.getCollection("rivals_tickets_tickets");
+            Document filter = new Document();
+            filter.put("channel_id", channel.getId());
+            Document assign = new Document();
+            assign.put("assignees", assigneeIds);
+            Document update = new Document();
+            update.put("$set", assign);
+            collection.updateOne(filter, update, new UpdateOptions().upsert(true));
+        });
+    }
+
+    public static void removeAssignee(@NotNull Channel channel, @Nullable Member member) {
+        if (member == null) return;
+        List<Member> assignees = getAssignedTo(channel);
+        assignees.remove(member);
+        List<String> assigneeIds = assignees.stream().map(ISnowflake::getId).toList();
+
+        Storage.mongo(database -> {
+            MongoCollection<Document> collection = database.getCollection("rivals_tickets_tickets");
+            Document filter = new Document();
+            filter.put("channel_id", channel.getId());
+            Document assign = new Document();
+            assign.put("assignees", assigneeIds);
+            Document update = new Document();
+            update.put("$set", assign);
+            collection.updateOne(filter, update, new UpdateOptions().upsert(true));
+        });
+    }
+
+    public static List<Member> getAssignedTo(@NotNull Channel channel) {
+        List<Member> assignees = new ArrayList<>();
+        Storage.mongo(database -> {
+            MongoCollection<Document> collection = database.getCollection("rivals_tickets_tickets");
+            Document filter = new Document();
+            filter.put("channel_id", channel.getId());
+            FindIterable<Document> cursor = collection.find(filter);
+            try (final MongoCursor<Document> iterator = cursor.cursor()) {
+                if (iterator.hasNext()) {
+                    List<String> assigneeIds = iterator.next().getList("assignees", String.class);
+                    if (assigneeIds == null) return;
+                    for (String assignee : assigneeIds) {
+                        assignees.add(Main.getGuild().getMemberById(assignee));
+                    }
+                }
+            }
+        });
+
+        return assignees;
+    }
+
+    public static List<Channel> getAssignedChannels(@NotNull User user) {
+        List<Channel> channels = new ArrayList<>();
+        Storage.mongo(database -> {
+            MongoCollection<Document> collection = database.getCollection("rivals_tickets_tickets");
+            FindIterable<Document> cursor = collection.find();
+            try (final MongoCursor<Document> iterator = cursor.cursor()) {
+                while (iterator.hasNext()) {
+                    Document next = iterator.next();
+                    if (next.getBoolean("closed")) continue;
+                    Channel channel = Main.getGuild().getTextChannelById(next.getString("channel_id"));
+                    if (channel == null) continue;
+                    List<String> assignees = next.getList("assignees", String.class);
+                    if (assignees == null) continue;
+                    if (!assignees.contains(user.getId())) continue;
+
+                    channels.add(channel);
+                }
+            }
+        });
+
+        return channels;
     }
 
     @NotNull

@@ -52,6 +52,8 @@ public class Config extends AbstractConfig {
     public static int CLOSE_COLOR = 0x0997f7;
     @Key("embed.close.button.name")
     public static String CLOSE_BUTTON_NAME = "\uD83D\uDD12 Lezárás";
+    @Key("embed.assign.button.name")
+    public static String ASSIGN_BUTTON_NAME = "\uD83D\uDD12 Claimelés";
     @Key("embed.select.color")
     public static int SELECT_COLOR = 0x00ff00;
     @Key("embed.select.field.title")
@@ -62,6 +64,8 @@ public class Config extends AbstractConfig {
     public static String CHANNEL_CREATED = "Létrehozva a hibajegyed! <#$channelId>";
     @Key("ticket.cant-close")
     public static String CANT_CLOSE = "Csak staff zárhat le hibajegyet!";
+    @Key("ticket.cant-close")
+    public static String CANT_ASSIGN = "Csak staffot lehet hozzárendelni egy hibajegyhez!";
     @Key("ticket.dump.guildid")
     public static String DUMP_GUILD_ID = "1064541123021901824";
     @Key("ticket.dump.channelid")
