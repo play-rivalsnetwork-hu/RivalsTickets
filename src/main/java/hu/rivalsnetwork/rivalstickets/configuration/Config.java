@@ -115,6 +115,17 @@ public class Config extends AbstractConfig {
     public static String TOPLIST_FOOTER = "**Ekkortól: $date**";
     @Key("time-format")
     public static String TIME_FORMAT = "<t:$epochSeconds>";
+    @Key("review-channel.id")
+    public static long REVIEW_CHANNEL_ID = 1058025532266123274L;
+    @Key("review-channel.emoji.id")
+    public static long REVIEW_CHANNEL_EMOJI_ID = 971088003365756968L;
+    @Key("review-channel.emoji.name")
+    public static String REVIEW_CHANNEL_EMOJI_NAME = "yes";
+    @Key("review-channel.emoji.name")
+    public static boolean REVIEW_CHANNEL_EMOJI_ANIMATED = false;
+    @Key("review-channel.thread-name")
+    public static String REVIEW_CHANNEL_THREAD_NAME = "Felülbírálás";
+
 
     public static final Config CONFIG = new Config();
 
