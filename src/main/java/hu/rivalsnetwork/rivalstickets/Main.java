@@ -52,7 +52,7 @@ public class Main {
         jda.upsertCommand("unassign", "Remove an assignee from the ticket").addOption(OptionType.USER, "assignee", "A staff akit elvegyünk").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
         jda.upsertCommand("getassignee", "Get the currently assigned person").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
         jda.upsertCommand("tickets", "Get the tickets that are assigned to you").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
-        jda.addEventListener(new TicketEmbedCommand(), new CreateButtonListener(), new CreateModalListener(), new CreateStringReasonListener(), new CloseButtonListener(), new CloseModalListener(), new MessageSendListener(), /*new TicketRenameCommand(),*/ new TicketStaffInfoCommand(), new TicketAssignCommand(), new TicketGetAssignedTicketsCommand(), new TicketGetAssignedCommand(), new TicketUnAssignCommand(), new AssignButtonListener());
+        jda.addEventListener(new TicketEmbedCommand(), new CreateButtonListener(), new CreateModalListener(), new CreateStringReasonListener(), new CloseButtonListener(), new CloseModalListener(), new MessageSendListener(), /*new TicketRenameCommand(),*/ new TicketStaffInfoCommand(), new TicketAssignCommand(), new TicketGetAssignedTicketsCommand(), new TicketGetAssignedCommand(), new TicketUnAssignCommand(), new AssignButtonListener(), new ReviewMessageListener());
     }
 
     public static File getDataFolder() {
