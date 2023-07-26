@@ -43,6 +43,7 @@ public class MessageSendListener extends ListenerAdapter {
 
                 for (Message.Attachment attachment : attachmentList) {
                     attachment.getProxy().download().thenAccept(stream -> {
+                        attachment.close();
                         int[] amount = {0};
                         Main.getJDA().getGuildById(Config.DUMP_GUILD_ID).getTextChannelById(Config.DUMP_CHANNEL_ID).sendFiles(FileUpload.fromData(stream, attachment.getFileName())).queue(message -> {
                             secondAttachmentList.set(message.getAttachments());
@@ -63,9 +64,11 @@ public class MessageSendListener extends ListenerAdapter {
                                         ch.deleteWebhookById(webhook.getId()).queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_WEBHOOK));
                                     }
                                 });
+                                messageAttachment.close();
                             }
                         });
                     });
+                    attachment.close();
                 }
             } catch (Exception e) {}
         });

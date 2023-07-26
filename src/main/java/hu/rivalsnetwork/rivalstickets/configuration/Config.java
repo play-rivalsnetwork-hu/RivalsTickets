@@ -121,11 +121,22 @@ public class Config extends AbstractConfig {
     public static long REVIEW_CHANNEL_EMOJI_ID = 971088003365756968L;
     @Key("review-channel.emoji.name")
     public static String REVIEW_CHANNEL_EMOJI_NAME = "yes";
-    @Key("review-channel.emoji.name")
+    @Key("review-channel.emoji.animated")
     public static boolean REVIEW_CHANNEL_EMOJI_ANIMATED = false;
     @Key("review-channel.thread-name")
     public static String REVIEW_CHANNEL_THREAD_NAME = "Felülbírálás";
-
+    @Key("current-open-tickets.no-category")
+    public static String CURRENTLY_OPEN_TICKETS_NO_CATEGORY = "Kategória nélkül";
+    @Key("current-open-tickets.embed.color")
+    public static int CURRENTLY_OPEN_TICKETS_COLOR = 0x00ff00;
+    @Key("current-open-tickets.title")
+    public static String CURRENTLY_OPEN_TICKETS_TITLE = "Nyitott hibajegyek";
+    @Key("current-open-tickets.field.title")
+    public static String CURRENTLY_OPEN_TICKETS_FIELD_TITLE = "$category";
+    @Key("current-open-tickets.field.content")
+    public static String CURRENTLY_OPEN_TICKETS_FIELD_CONTENT = "$amount";
+    @Key("current-open-tickets.footer")
+    public static String CURRENTLY_OPEN_TICKETS_FOOTER = "Összesen: $amount";
 
     public static final Config CONFIG = new Config();
 
