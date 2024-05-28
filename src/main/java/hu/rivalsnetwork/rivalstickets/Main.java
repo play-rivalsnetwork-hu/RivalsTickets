@@ -5,7 +5,6 @@ import hu.rivalsnetwork.rivalstickets.commands.TicketEmbedCommand;
 import hu.rivalsnetwork.rivalstickets.commands.TicketGetAssignedCommand;
 import hu.rivalsnetwork.rivalstickets.commands.TicketGetAssignedTicketsCommand;
 import hu.rivalsnetwork.rivalstickets.commands.TicketListCommand;
-import hu.rivalsnetwork.rivalstickets.commands.TicketRenameCommand;
 import hu.rivalsnetwork.rivalstickets.commands.TicketStaffInfoCommand;
 import hu.rivalsnetwork.rivalstickets.commands.TicketUnAssignCommand;
 import hu.rivalsnetwork.rivalstickets.configuration.Config;
