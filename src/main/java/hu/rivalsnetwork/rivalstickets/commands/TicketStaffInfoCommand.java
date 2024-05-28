@@ -1,9 +1,5 @@
 package hu.rivalsnetwork.rivalstickets.commands;
 
-import com.github.ygimenez.method.Pages;
-import com.github.ygimenez.model.InteractPage;
-import com.github.ygimenez.model.Page;
-import com.google.common.collect.Lists;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -13,7 +9,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.InteractionHook;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,11 +20,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class TicketStaffInfoCommand extends ListenerAdapter {
@@ -62,34 +54,18 @@ public class TicketStaffInfoCommand extends ListenerAdapter {
     }
 
     private static void staffInfoEmbed(@NotNull HashMap<String, Integer> map, @NotNull SlashCommandInteractionEvent event, @NotNull Date date) {
-        AtomicInteger counter = new AtomicInteger(1);
-        List<MessageEmbed.Field> fields = new LinkedList<>();
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setColor(Config.TOPLIST_COLOR);
+        builder.setTitle(Config.TOPLIST_TITLE);
+        builder.setFooter(Config.TOPLIST_FOOTER.replace("$date", date.toString()));
+        int[] pos = {0};
 
         map.forEach((key, value) -> {
-            int pos = counter.getAndIncrement();
-            fields.add(new MessageEmbed.Field(Config.TOPLIST_FIELD_TITLE.replace("$name", key).replace("$amount", value.toString()).replace("$position", String.valueOf(pos)), Config.TOPLIST_FIELD_CONTENT.replace("$name", key).replace("$amount", value.toString()).replace("$position", String.valueOf(pos)), Config.TOPLIST_INLINE));
+            pos[0]++;
+            builder.addField(new MessageEmbed.Field(Config.TOPLIST_FIELD_TITLE.replace("$name", key).replace("$amount", value.toString()).replace("$position", String.valueOf(pos[0])), Config.TOPLIST_FIELD_CONTENT.replace("$name", key).replace("$amount", value.toString()).replace("$position", String.valueOf(pos[0])), Config.TOPLIST_INLINE));
         });
 
-        List<Page> pages = new LinkedList<>();
-        Lists.partition(fields, 24).forEach(list -> {
-            EmbedBuilder builder = new EmbedBuilder();
-            builder.setColor(Config.TOPLIST_COLOR);
-            builder.setTitle(Config.TOPLIST_TITLE);
-            builder.setFooter(Config.TOPLIST_FOOTER.replace("$date", date.toString()));
-
-            for (MessageEmbed.Field field : list) {
-                builder.addField(field);
-            }
-
-            pages.add(InteractPage.of(builder.build()));
-        });
-
-        event.deferReply(true).queue();
-        event.reply(Config.TOPLIST_REPLY).queue();
-
-        event.getChannel().sendMessageEmbeds((MessageEmbed) pages.get(0).getContent()).queue(success -> {
-            Pages.paginate(success, pages, true);
-        });
+        event.replyEmbeds(builder.build()).queue();
     }
 
     // https://www.geeksforgeeks.org/sorting-a-hashmap-according-to-values/ && https://www.javacodegeeks.com/2017/09/java-8-sorting-hashmap-values-ascending-descending-order.html

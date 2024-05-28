@@ -113,8 +113,6 @@ public class Config extends AbstractConfig {
     public static boolean TOPLIST_INLINE = true;
     @Key("embed.toplist.footer")
     public static String TOPLIST_FOOTER = "**Ekkortól: $date**";
-    @Key("toplist-reply")
-    public static String TOPLIST_REPLY = "Lekérted a toplistát!";
     @Key("time-format")
     public static String TIME_FORMAT = "<t:$epochSeconds>";
     @Key("review-channel.id")
