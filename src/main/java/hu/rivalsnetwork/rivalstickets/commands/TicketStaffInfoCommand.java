@@ -61,6 +61,7 @@ public class TicketStaffInfoCommand extends ListenerAdapter {
         int[] pos = {0};
 
         map.forEach((key, value) -> {
+            if (pos[0] > 24) return;
             pos[0]++;
             builder.addField(new MessageEmbed.Field(Config.TOPLIST_FIELD_TITLE.replace("$name", key).replace("$amount", value.toString()).replace("$position", String.valueOf(pos[0])), Config.TOPLIST_FIELD_CONTENT.replace("$name", key).replace("$amount", value.toString()).replace("$position", String.valueOf(pos[0])), Config.TOPLIST_INLINE));
         });
