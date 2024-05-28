@@ -1,15 +1,23 @@
 package hu.rivalsnetwork.rivalstickets;
 
+import com.github.ygimenez.method.Pages;
+import com.github.ygimenez.model.PaginatorBuilder;
 import hu.rivalsnetwork.rivalstickets.commands.TicketAssignCommand;
 import hu.rivalsnetwork.rivalstickets.commands.TicketEmbedCommand;
 import hu.rivalsnetwork.rivalstickets.commands.TicketGetAssignedCommand;
 import hu.rivalsnetwork.rivalstickets.commands.TicketGetAssignedTicketsCommand;
 import hu.rivalsnetwork.rivalstickets.commands.TicketListCommand;
-import hu.rivalsnetwork.rivalstickets.commands.TicketRenameCommand;
 import hu.rivalsnetwork.rivalstickets.commands.TicketStaffInfoCommand;
 import hu.rivalsnetwork.rivalstickets.commands.TicketUnAssignCommand;
 import hu.rivalsnetwork.rivalstickets.configuration.Config;
-import hu.rivalsnetwork.rivalstickets.listeners.*;
+import hu.rivalsnetwork.rivalstickets.listeners.AssignButtonListener;
+import hu.rivalsnetwork.rivalstickets.listeners.CloseButtonListener;
+import hu.rivalsnetwork.rivalstickets.listeners.CloseModalListener;
+import hu.rivalsnetwork.rivalstickets.listeners.CreateButtonListener;
+import hu.rivalsnetwork.rivalstickets.listeners.CreateModalListener;
+import hu.rivalsnetwork.rivalstickets.listeners.CreateStringReasonListener;
+import hu.rivalsnetwork.rivalstickets.listeners.MessageSendListener;
+import hu.rivalsnetwork.rivalstickets.listeners.ReviewMessageListener;
 import hu.rivalsnetwork.rivalstickets.storage.Storage;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -44,6 +52,11 @@ public class Main {
 
         Config.reload();
         Storage.reload();
+
+        Pages.activate(PaginatorBuilder.createPaginator(jda)
+                .shouldEventLock(true)
+                .shouldRemoveOnReact(false)
+                .build());
 
         Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
         jda.upsertCommand("ticketembed", "Ticket embed message").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).queue();
