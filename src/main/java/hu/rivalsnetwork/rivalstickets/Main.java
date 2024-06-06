@@ -8,7 +8,14 @@ import hu.rivalsnetwork.rivalstickets.commands.TicketListCommand;
 import hu.rivalsnetwork.rivalstickets.commands.TicketStaffInfoCommand;
 import hu.rivalsnetwork.rivalstickets.commands.TicketUnAssignCommand;
 import hu.rivalsnetwork.rivalstickets.configuration.Config;
-import hu.rivalsnetwork.rivalstickets.listeners.*;
+import hu.rivalsnetwork.rivalstickets.listeners.AssignButtonListener;
+import hu.rivalsnetwork.rivalstickets.listeners.CloseButtonListener;
+import hu.rivalsnetwork.rivalstickets.listeners.CloseModalListener;
+import hu.rivalsnetwork.rivalstickets.listeners.CreateButtonListener;
+import hu.rivalsnetwork.rivalstickets.listeners.CreateModalListener;
+import hu.rivalsnetwork.rivalstickets.listeners.CreateStringReasonListener;
+import hu.rivalsnetwork.rivalstickets.listeners.MessageSendListener;
+import hu.rivalsnetwork.rivalstickets.listeners.ReviewMessageListener;
 import hu.rivalsnetwork.rivalstickets.storage.Storage;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -47,13 +54,12 @@ public class Main {
         Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
         jda.upsertCommand("ticketembed", "Ticket embed message").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).queue();
         jda.upsertCommand("tickettoplist", "Staff info command").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).addOption(OptionType.INTEGER, "time", "Idő").queue();
-//        jda.upsertCommand("rename", "Rename ticket command").addOption(OptionType.STRING, "name", "A hibajegy új neve").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
         jda.upsertCommand("assign", "Assign a staff to a ticket").addOption(OptionType.USER, "assignee", "A hozzácsatolt staff").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
         jda.upsertCommand("unassign", "Remove an assignee from the ticket").addOption(OptionType.USER, "assignee", "A staff akit elvegyünk").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
         jda.upsertCommand("getassignee", "Get the currently assigned person").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
         jda.upsertCommand("tickets", "Get the tickets that are assigned to you").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
         jda.upsertCommand("ticketlist", "Get the amount of open tickets").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
-        jda.addEventListener(new TicketEmbedCommand(), new CreateButtonListener(), new CreateModalListener(), new CreateStringReasonListener(), new CloseButtonListener(), new CloseModalListener(), new MessageSendListener(), /*new TicketRenameCommand(),*/ new TicketStaffInfoCommand(), new TicketAssignCommand(), new TicketGetAssignedTicketsCommand(), new TicketGetAssignedCommand(), new TicketUnAssignCommand(), new AssignButtonListener(), new ReviewMessageListener(), new TicketListCommand());
+        jda.addEventListener(new TicketEmbedCommand(), new CreateButtonListener(), new CreateModalListener(), new CreateStringReasonListener(), new CloseButtonListener(), new CloseModalListener(), /*new MessageSendListener(),*/ new TicketStaffInfoCommand(), new TicketAssignCommand(), new TicketGetAssignedTicketsCommand(), new TicketGetAssignedCommand(), new TicketUnAssignCommand(), new AssignButtonListener(), new ReviewMessageListener(), new TicketListCommand());
     }
 
     public static File getDataFolder() {

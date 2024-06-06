@@ -37,12 +37,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class Executor {
 
     public static boolean isTicketBanned(@NotNull String id) {
-        boolean[] ticketBanned = {false};
+        AtomicBoolean ticketBanned = new AtomicBoolean();
 
         Storage.mongo(database -> {
             MongoCollection<Document> collection = database.getCollection("rivals_tickets_users");
@@ -51,12 +54,12 @@ public class Executor {
             FindIterable<Document> cursor = collection.find(find);
             try (final MongoCursor<Document> iterator = cursor.cursor()) {
                 if (iterator.hasNext()) {
-                    ticketBanned[0] = iterator.next().getBoolean("ticket_banned");
+                    ticketBanned.set(iterator.next().getBoolean("ticket_banned"));
                 }
             }
         });
 
-        return ticketBanned[0];
+        return ticketBanned.get();
     }
 
     public static void createUser(@NotNull Member member) {
@@ -132,7 +135,7 @@ public class Executor {
     }
 
     public static String getMemberIdByChannel(@NotNull TextChannel channel) {
-        String[] memberID = {null};
+        AtomicReference<String> memberID = new AtomicReference<>();
         Storage.mongo(database -> {
             MongoCollection<Document> collection = database.getCollection("rivals_tickets_tickets");
             Document search = new Document();
@@ -140,16 +143,16 @@ public class Executor {
             FindIterable<Document> cursor = collection.find(search);
             try (final MongoCursor<Document> iterator = cursor.cursor()) {
                 if (iterator.hasNext()) {
-                    memberID[0] = iterator.next().getString("owner");
+                    memberID.set(iterator.next().getString("owner"));
                 }
             }
         });
 
-        return memberID[0];
+        return memberID.get();
     }
 
     public static boolean isTicket(@NotNull TextChannel channel) {
-        boolean[] ticket = {false};
+        AtomicBoolean ticket = new AtomicBoolean();
         Storage.mongo(database -> {
             MongoCollection<Document> collection = database.getCollection("rivals_tickets_tickets");
             Document search = new Document();
@@ -157,16 +160,16 @@ public class Executor {
             FindIterable<Document> cursor = collection.find(search);
             try (final MongoCursor<Document> iterator = cursor.cursor()) {
                 if (iterator.hasNext()) {
-                    ticket[0] = true;
+                    ticket.set(true);
                 }
             }
         });
 
-        return ticket[0];
+        return ticket.get();
     }
 
     public static boolean hasOpenTicket(@NotNull Member member) {
-        boolean[] hasTicket = {false};
+        AtomicBoolean hasTicket = new AtomicBoolean();
         Storage.mongo(database -> {
             MongoCollection<Document> collection = database.getCollection("rivals_tickets_tickets");
             Document find = new Document();
@@ -179,17 +182,17 @@ public class Executor {
                     TextChannel channel = Main.getGuild().getTextChannelById(next.getString("channel_id"));
                     if (channel == null) continue;
 
-                    hasTicket[0] = true;
+                    hasTicket.set(true);
                     break;
                 }
             }
         });
 
-        return hasTicket[0];
+        return hasTicket.get();
     }
 
     public static boolean doesUserExist(@NotNull Member member) {
-        boolean[] exists = {false};
+        AtomicBoolean exists = new AtomicBoolean();
 
         Storage.mongo(database -> {
             MongoCollection<Document> collection = database.getCollection("rivals_tickets_users");
@@ -198,16 +201,16 @@ public class Executor {
             FindIterable<Document> cursor = collection.find(find);
             try (final MongoCursor<Document> iterator = cursor.cursor()) {
                 if (iterator.hasNext()) {
-                    exists[0] = true;
+                    exists.set(true);
                 }
             }
         });
 
-        return exists[0];
+        return exists.get();
     }
 
     public static int getNextID(String collectionName) {
-        int[] id = {0};
+        AtomicInteger id = new AtomicInteger();
         Storage.mongo(database -> {
             MongoCollection<Document> collection = database.getCollection(collectionName);
             Document find = new Document();
@@ -215,10 +218,10 @@ public class Executor {
             Document update = new Document();
             update.put("$inc", new Document("seq", 1));
             Document object = collection.findOneAndUpdate(find, update, new FindOneAndUpdateOptions().upsert(true));
-            id[0] = object.getInteger("seq");
+            id.set(object.getInteger("seq"));
         });
 
-        return id[0];
+        return id.get();
     }
 
     public static void createTicket(@NotNull Member member, TextChannel channel, int id, @NotNull String userName) {
@@ -285,7 +288,7 @@ public class Executor {
     }
 
     public static String getURL(TextChannel channel) {
-        String[] url = {null};
+        AtomicReference<String> url = new AtomicReference<>();
         Storage.mongo(database -> {
             MongoCollection<Document> collection = database.getCollection("rivals_tickets_tickets");
             Document search = new Document();
@@ -293,12 +296,12 @@ public class Executor {
             FindIterable<Document> cursor = collection.find(search);
             try (final MongoCursor<Document> iterator = cursor.cursor()) {
                 if (iterator.hasNext()) {
-                    url[0] = "[A transcript megtekintéséhez kattints ide!](https://tickets.rivalsnetwork.hu/" + iterator.next().getString("uuid") + ")";
+                    url.set("[A transcript megtekintéséhez kattints ide!](https://tickets.rivalsnetwork.hu/" + iterator.next().getString("uuid") + ")");
                 }
             }
         });
 
-        return url[0];
+        return url.get();
     }
 
     public static void assignTo(@NotNull Channel channel, @Nullable Member member) {
