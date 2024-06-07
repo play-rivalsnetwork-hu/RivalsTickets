@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import org.jetbrains.annotations.NotNull;
 import org.simpleyaml.configuration.ConfigurationSection;
 
@@ -27,7 +28,11 @@ public class CreateStringReasonListener extends ListenerAdapter {
         ConfigurationSection section = categories.getConfigurationSection(option);
 
         if (section.getStringList("child") == null || section.getStringList("child").isEmpty()) {
-            event.getChannel().sendMessageEmbeds(finishEmbed()).addContent(Main.getGuild().getRoleById(Config.ROLE_TO_PING).getAsMention()).queue();
+            MessageCreateAction action = event.getChannel().sendMessageEmbeds(finishEmbed());
+            if (!Config.ROLE_TO_PING.isBlank()) {
+                action.addContent(Main.getGuild().getRoleById(Config.ROLE_TO_PING).getAsMention());
+            }
+            action.queue();
             event.getMessage().delete().queue();
             event.getChannel().asTextChannel().getManager().putMemberPermissionOverride(event.getUser().getIdLong(), EnumSet.of(Permission.MESSAGE_SEND, Permission.VIEW_CHANNEL), null).queue();
             event.getChannel().asTextChannel().getManager().setParent(Main.getGuild().getCategoryById(section.getString("categoryid"))).queue();
