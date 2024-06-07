@@ -47,6 +47,8 @@ public class Config extends AbstractConfig {
     **Kérlek, válaszd ki a kategóriát, amiben segíteni tudunk.**
     \n
     **Játékosnév: $username**
+    
+    **Probléma rövid leírása**: $description
     """;
     @Key("embed.close.color")
     public static int CLOSE_COLOR = 0x0997f7;
@@ -137,6 +139,10 @@ public class Config extends AbstractConfig {
     public static String CURRENTLY_OPEN_TICKETS_FIELD_CONTENT = "$amount";
     @Key("current-open-tickets.footer")
     public static String CURRENTLY_OPEN_TICKETS_FOOTER = "Összesen: $amount";
+    @Key("description")
+    public static String DESCRIPTION = "Kérlek, írd le röviden a problémádat!";
+    @Key("transcript-dns")
+    public static String TRANSCRIPT_DNS = "https://tickets.rivalsnetwork.hu/";
 
     public static final Config CONFIG = new Config();
 

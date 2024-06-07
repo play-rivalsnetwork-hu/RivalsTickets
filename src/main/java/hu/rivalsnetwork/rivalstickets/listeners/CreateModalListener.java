@@ -25,7 +25,7 @@ public class CreateModalListener extends ListenerAdapter {
 
     @Override
     public void onModalInteraction(@NotNull ModalInteractionEvent event) {
-        if (!event.getModalId().equals("ticket_username_select")) return;
+        if (!event.getModalId().equals("ticket_open_modal")) return;
         int ticketId = Executor.getNextID("rivals_tickets_counter");
         Category category = Main.getGuild().getCategoryById(Config.DEFAULT_CATEGORY_ID);
 
@@ -33,7 +33,7 @@ public class CreateModalListener extends ListenerAdapter {
             List<Button> list = new ArrayList<>();
             list.add(Button.primary("rivalstickets_close", Config.CLOSE_BUTTON_NAME).withStyle(ButtonStyle.DANGER));
             list.add(Button.primary("rivalstickets_assign", Config.ASSIGN_BUTTON_NAME).withStyle(ButtonStyle.PRIMARY));
-            channel.sendMessageEmbeds(closeEmbed(event.getMember(), event.getValue("username").getAsString())).addContent(event.getMember().getAsMention()).addActionRow(list).queue();
+            channel.sendMessageEmbeds(closeEmbed(event.getMember(), event.getValue("username").getAsString(), event.getValue("ticket_description").getAsString())).addContent(event.getMember().getAsMention()).addActionRow(list).queue();
 
             StringSelectMenu.Builder menu = StringSelectMenu.create("rivalstickets_reason_select");
 
@@ -68,10 +68,10 @@ public class CreateModalListener extends ListenerAdapter {
     }
 
     @NotNull
-    private MessageEmbed closeEmbed(@NotNull Member member, @NotNull String username) {
+    private MessageEmbed closeEmbed(@NotNull Member member, @NotNull String username, @NotNull String description) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Config.CLOSE_COLOR);
-        builder.addField(new MessageEmbed.Field(Config.CLOSE_TITLE, Config.CLOSE_CONTENT.replace("$id", member.getId()).replace("$username", username), false));
+        builder.addField(new MessageEmbed.Field(Config.CLOSE_TITLE, Config.CLOSE_CONTENT.replace("$id", member.getId()).replace("$description", description).replace("$username", username), false));
         return builder.build();
     }
 }

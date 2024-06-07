@@ -120,7 +120,7 @@ public class Executor {
                                 .replace("$name", channel.getName())
                                 .replace("$category", channel.getParentCategory() == null ? "---" : channel.getParentCategory().getName())
                                 .replace("$channelId", channel.getId())
-                                .replace("$url", "https://tickets.rivalsnetwork.hu/" + next.getString("uuid"))
+                                .replace("$url", Config.TRANSCRIPT_DNS + next.getString("uuid"))
                                 .replace("$playerName", next.getString("username"))
                                 .replace("$opener", next.getString("owner-formatted-discord-name"))
                                 .replace("$open", Config.TIME_FORMAT.replace ("$epochSeconds", String.valueOf(((Date) next.get("open-time")).toInstant().getEpochSecond())))
@@ -296,7 +296,7 @@ public class Executor {
             FindIterable<Document> cursor = collection.find(search);
             try (final MongoCursor<Document> iterator = cursor.cursor()) {
                 if (iterator.hasNext()) {
-                    url.set("[A transcript megtekintéséhez kattints ide!](https://tickets.rivalsnetwork.hu/" + iterator.next().getString("uuid") + ")");
+                    url.set("[A transcript megtekintéséhez kattints ide!](" + Config.TRANSCRIPT_DNS + iterator.next().getString("uuid") + ")");
                 }
             }
         });

@@ -14,7 +14,6 @@ import hu.rivalsnetwork.rivalstickets.listeners.CloseModalListener;
 import hu.rivalsnetwork.rivalstickets.listeners.CreateButtonListener;
 import hu.rivalsnetwork.rivalstickets.listeners.CreateModalListener;
 import hu.rivalsnetwork.rivalstickets.listeners.CreateStringReasonListener;
-import hu.rivalsnetwork.rivalstickets.listeners.MessageSendListener;
 import hu.rivalsnetwork.rivalstickets.listeners.ReviewMessageListener;
 import hu.rivalsnetwork.rivalstickets.storage.Storage;
 import net.dv8tion.jda.api.JDA;

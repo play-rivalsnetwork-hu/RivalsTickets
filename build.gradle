@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("net.dv8tion:JDA:5.0.0-beta.12")
+    compileOnly("net.dv8tion:JDA:5.0.0-beta.24")
     compileOnly("me.carleslc.Simple-YAML:Simple-Yaml:1.8.4")
     compileOnly("org.apache.commons:commons-lang3:3.12.0")
     compileOnly("org.mongodb:mongodb-driver-sync:4.9.1")

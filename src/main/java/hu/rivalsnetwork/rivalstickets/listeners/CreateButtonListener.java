@@ -30,13 +30,21 @@ public class CreateButtonListener extends ListenerAdapter {
             return;
         }
 
+        String nickName = event.getMember().getNickname();
+
         TextInput userName = TextInput.create("username", "Játékosnév", TextInputStyle.SHORT)
                 .setRequiredRange(3, 16)
+                .setValue(nickName == null ? "Játékosneved" : nickName)
                 .setRequired(true)
                 .build();
 
-        Modal modal = Modal.create("ticket_username_select", "Hibajegy készítés")
+        TextInput description = TextInput.create("ticket_description", Config.DESCRIPTION, TextInputStyle.PARAGRAPH)
+                .setRequired(true)
+                .build();
+
+        Modal modal = Modal.create("ticket_open_modal", "Hibajegy készítés")
                 .addActionRow(userName)
+                .addActionRow(description)
                 .build();
 
         event.replyModal(modal).queue();
