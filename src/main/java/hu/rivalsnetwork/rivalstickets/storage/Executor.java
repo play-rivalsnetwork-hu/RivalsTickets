@@ -1,5 +1,7 @@
 package hu.rivalsnetwork.rivalstickets.storage;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -25,11 +27,14 @@ import org.bson.conversions.Bson;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.simpleyaml.configuration.ConfigurationSection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.time.Duration;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -43,6 +48,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class Executor {
+    private static final Logger log = LoggerFactory.getLogger(Executor.class);
+    private static final Cache<String, Boolean> hasOpenTicket = Caffeine.newBuilder()
+            .expireAfterWrite(Duration.ofHours(4))
+            .build();
+    private static final Cache<String, Boolean> ticketChannels = Caffeine.newBuilder()
+            .expireAfterWrite(Duration.ofHours(4))
+            .build();
 
     public static boolean isTicketBanned(@NotNull String id) {
         AtomicBoolean ticketBanned = new AtomicBoolean();
@@ -77,6 +89,7 @@ public class Executor {
 
     public static void deleteTicket(@NotNull Member closer, @NotNull TextChannel channel, @NotNull String reason)  {
         if (!isTicket(channel)) return;
+        ticketChannels.invalidate(channel.getId());
         DiscordHtmlTranscripts transcript = DiscordHtmlTranscripts.getInstance();
 
         try (InputStream stream = transcript.generateFromMessages(channel.getIterableHistory().stream().collect(Collectors.toList()))) {
@@ -86,13 +99,13 @@ public class Executor {
             channel.delete().queue();
 
             if (userId == null) return;
+            hasOpenTicket.invalidate(userId);
             User user = Main.getJDA().getUserById(userId);
             if (user != null) {
                 user.openPrivateChannel().flatMap(privateChannel -> privateChannel.sendMessageEmbeds(closeEmbed(closer, reason, channel))).queue(null, new ErrorHandler().ignore(ErrorResponse.CANNOT_SEND_TO_USER));
             }
         } catch (Exception exception) {
-            exception.printStackTrace();
-            System.getLogger("RivalsTickets").log(System.Logger.Level.ERROR, "There was an issue while getting inputstream for transcript!");
+            log.error("There was an issue while getting inputstream for transcript!", exception);
         }
     }
 
@@ -152,43 +165,69 @@ public class Executor {
     }
 
     public static boolean isTicket(@NotNull TextChannel channel) {
-        AtomicBoolean ticket = new AtomicBoolean();
-        Storage.mongo(database -> {
-            MongoCollection<Document> collection = database.getCollection("rivals_tickets_tickets");
-            Document search = new Document();
-            search.put("channel_id", channel.getId());
-            FindIterable<Document> cursor = collection.find(search);
-            try (final MongoCursor<Document> iterator = cursor.cursor()) {
-                if (iterator.hasNext()) {
-                    ticket.set(true);
-                }
-            }
-        });
+        return ticketChannels.get(channel.getId(), id -> {
+            AtomicBoolean ticket = new AtomicBoolean();
+            Storage.mongo(database -> {
+                MongoCollection<Document> collection = database.getCollection("rivals_tickets_tickets");
+                Document search = new Document();
+                search.put("channel_id", id);
 
-        return ticket.get();
+                FindIterable<Document> cursor = collection.find(search).filter(Filters.eq("closed", false));
+                try (final MongoCursor<Document> iterator = cursor.cursor()) {
+                    if (iterator.hasNext()) {
+                        ticket.set(true);
+                    }
+                }
+            });
+
+            return ticket.get();
+        });
     }
 
     public static boolean hasOpenTicket(@NotNull Member member) {
-        AtomicBoolean hasTicket = new AtomicBoolean();
-        Storage.mongo(database -> {
-            MongoCollection<Document> collection = database.getCollection("rivals_tickets_tickets");
-            Document find = new Document();
-            find.put("owner", member.getId());
-            FindIterable<Document> cursor = collection.find(find);
-            try (final MongoCursor<Document> iterator = cursor.cursor()) {
-                while (iterator.hasNext()) {
-                    Document next = iterator.next();
-                    if (next.getBoolean("closed")) continue;
-                    TextChannel channel = Main.getGuild().getTextChannelById(next.getString("channel_id"));
-                    if (channel == null) continue;
+        return hasOpenTicket.get(member.getId(), id -> {
+            AtomicBoolean hasTicket = new AtomicBoolean();
+            AtomicReference<List<String>> closed = new AtomicReference<>();
 
-                    hasTicket.set(true);
-                    break;
+            Storage.mongo(database -> {
+                MongoCollection<Document> collection = database.getCollection("rivals_tickets_tickets");
+                Document find = new Document();
+                find.put("owner", id);
+                FindIterable<Document> cursor = collection.find(find).filter(Filters.eq("closed", false));
+
+                try (final MongoCursor<Document> iterator = cursor.cursor()) {
+                    while (iterator.hasNext()) {
+                        Document next = iterator.next();
+
+                        String channelId = next.getString("channel_id");
+                        TextChannel channel = Main.getGuild().getTextChannelById(channelId);
+
+                        // The ticket has been closed, but we don't know of it
+                        // we need to fix it up in the database
+                        if (channel == null) {
+                            List<String> closedReference;
+                            if ((closedReference = closed.get()) == null) {
+                                closedReference = new ArrayList<>();
+                                closed.set(closedReference);
+                            }
+
+                            closedReference.add(channelId);
+                            continue;
+                        }
+
+                        hasTicket.set(true);
+                        break;
+                    }
                 }
-            }
-        });
+            });
 
-        return hasTicket.get();
+            List<String> closedReference;
+            if ((closedReference = closed.get()) != null) {
+                fixupClosed(closedReference);
+            }
+
+            return hasTicket.get();
+        });
     }
 
     public static boolean doesUserExist(@NotNull Member member) {
@@ -218,13 +257,21 @@ public class Executor {
             Document update = new Document();
             update.put("$inc", new Document("seq", 1));
             Document object = collection.findOneAndUpdate(find, update, new FindOneAndUpdateOptions().upsert(true));
-            id.set(object.getInteger("seq"));
+
+            Integer integer;
+            if (object == null || (integer = object.getInteger("seq")) == null) {
+                id.set(0);
+            } else {
+                id.set(integer);
+            }
         });
 
         return id.get();
     }
 
     public static void createTicket(@NotNull Member member, TextChannel channel, int id, @NotNull String userName) {
+        hasOpenTicket.put(member.getId(), true);
+        ticketChannels.put(channel.getId(), true);
         Storage.mongo(database -> {
             MongoCollection<Document> collection = database.getCollection("rivals_tickets_tickets");
             Document document = new Document();
@@ -363,15 +410,32 @@ public class Executor {
 
     public static List<Channel> getAssignedChannels(@NotNull User user) {
         List<Channel> channels = new ArrayList<>();
+        AtomicReference<List<String>> closed = new AtomicReference<>();
+
         Storage.mongo(database -> {
             MongoCollection<Document> collection = database.getCollection("rivals_tickets_tickets");
-            FindIterable<Document> cursor = collection.find();
+            FindIterable<Document> cursor = collection.find().filter(Filters.eq("closed", false));
+
             try (final MongoCursor<Document> iterator = cursor.cursor()) {
                 while (iterator.hasNext()) {
                     Document next = iterator.next();
-                    if (next.getBoolean("closed")) continue;
-                    Channel channel = Main.getGuild().getTextChannelById(next.getString("channel_id"));
-                    if (channel == null) continue;
+
+                    String channelId = next.getString("channel_id");
+                    Channel channel = Main.getGuild().getTextChannelById(channelId);
+
+                    // The ticket has been closed, but we don't know of it
+                    // we need to fix it up in the database
+                    if (channel == null) {
+                        List<String> closedReference;
+                        if ((closedReference = closed.get()) == null) {
+                            closedReference = new ArrayList<>();
+                            closed.set(closedReference);
+                        }
+
+                        closedReference.add(channelId);
+                        continue;
+                    }
+
                     List<String> assignees = next.getList("assignees", String.class);
                     if (assignees == null) continue;
                     if (!assignees.contains(user.getId())) continue;
@@ -381,7 +445,28 @@ public class Executor {
             }
         });
 
+        List<String> closedReference;
+        if ((closedReference = closed.get()) != null) {
+            fixupClosed(closedReference);
+        }
+
         return channels;
+    }
+
+    private static void fixupClosed(List<String> closed) {
+        Storage.mongo(database -> {
+            MongoCollection<Document> collection = database.getCollection("rivals_tickets_tickets");
+
+            for (String s : closed) {
+                Document search = new Document();
+                search.put("channel_id", s);
+                Document document = new Document();
+                document.put("closed", true);
+                Document update = new Document();
+                update.put("$set", document);
+                collection.updateOne(search, update);
+            }
+        });
     }
 
     @NotNull

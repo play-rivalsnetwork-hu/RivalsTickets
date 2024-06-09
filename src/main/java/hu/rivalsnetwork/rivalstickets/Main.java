@@ -50,7 +50,6 @@ public class Main {
         Config.reload();
         Storage.reload();
 
-        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
         jda.upsertCommand("ticketembed", "Ticket embed message").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).queue();
         jda.upsertCommand("tickettoplist", "Staff info command").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).addOption(OptionType.INTEGER, "time", "Idő").queue();
         jda.upsertCommand("assign", "Assign a staff to a ticket").addOption(OptionType.USER, "assignee", "A hozzácsatolt staff").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();

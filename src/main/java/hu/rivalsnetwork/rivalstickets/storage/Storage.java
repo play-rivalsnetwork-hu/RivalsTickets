@@ -10,10 +10,13 @@ import com.mongodb.client.MongoDatabase;
 import hu.rivalsnetwork.rivalstickets.configuration.Config;
 import org.bson.UuidRepresentation;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 
 public class Storage {
+    private static final Logger log = LoggerFactory.getLogger(Storage.class);
     private static MongoClient client;
 
     public static void reload() {
@@ -31,7 +34,7 @@ public class Storage {
         try {
             callback.accept(client.getDatabase(Config.DATABASE));
         } catch (MongoException exception) {
-            exception.printStackTrace();
+            log.error("An exception occurred while using MongoDB!", exception);
         }
     }
 

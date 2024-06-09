@@ -19,6 +19,8 @@ dependencies {
     compileOnly("org.mongodb:mongodb-driver-sync:4.9.1")
     implementation("com.github.Ryzeon:discord-html-transcripts:2.0")
     implementation("club.minnced:discord-webhooks:0.8.2")
+    implementation("org.slf4j:slf4j-simple:1.7.36")
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 }
 
 tasks.register('bumpBuildNumber') {
@@ -27,7 +29,7 @@ tasks.register('bumpBuildNumber') {
 
 jar {
     manifest {
-        attributes["Class-Path"] = "libs/JDA-5.0.0-beta.12-withDependencies-min.jar libs/Simple-Yaml-1.8.4.jar libs/commons-lang3-3.12.0.jar libs/mongodb-driver-sync-4.9.1.jar libs/mongodb-driver-core-4.9.1.jar libs/bson-4.9.1.jar libs/discord-html-transcripts-1e7773b5b1.jar libs/jsoup-1.14.3.jar libs/discord-webhooks-0.8.2.jar libs/json-20210307.jar"
+        attributes["Class-Path"] = "libs/JDA-5.0.0-beta.12-withDependencies-min.jar libs/Simple-Yaml-1.8.4.jar libs/commons-lang3-3.12.0.jar libs/mongodb-driver-sync-4.9.1.jar libs/mongodb-driver-core-4.9.1.jar libs/bson-4.9.1.jar libs/discord-html-transcripts-1e7773b5b1.jar libs/jsoup-1.14.3.jar libs/discord-webhooks-0.8.2.jar libs/json-20210307.jar libs/caffeine-3.1.8.jar"
         attributes["Main-Class"] = "hu.rivalsnetwork.rivalstickets.Main"
     }
 }
