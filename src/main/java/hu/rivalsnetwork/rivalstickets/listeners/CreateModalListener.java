@@ -29,7 +29,7 @@ public class CreateModalListener extends ListenerAdapter {
         int ticketId = Executor.getNextID("rivals_tickets_counter");
         Category category = Main.getGuild().getCategoryById(Config.DEFAULT_CATEGORY_ID);
 
-        category.createTextChannel(Config.NAME_PATTERN.replace("$id", String.valueOf(ticketId))).addRolePermissionOverride(Config.DEFAULT_GROUP_ID, null, EnumSet.of(Permission.VIEW_CHANNEL)).addMemberPermissionOverride(event.getMember().getIdLong(), Permission.VIEW_CHANNEL.getRawValue(), Permission.MESSAGE_SEND.getRawValue()).queue(channel -> {
+        category.createTextChannel(Config.NAME_PATTERN.replace("$id", String.valueOf(ticketId)).replace("$name", event.getValue("username").getAsString())).addRolePermissionOverride(Config.DEFAULT_GROUP_ID, null, EnumSet.of(Permission.VIEW_CHANNEL)).addMemberPermissionOverride(event.getMember().getIdLong(), Permission.VIEW_CHANNEL.getRawValue(), Permission.MESSAGE_SEND.getRawValue()).queue(channel -> {
             List<Button> list = new ArrayList<>();
             list.add(Button.primary("rivalstickets_close", Config.CLOSE_BUTTON_NAME).withStyle(ButtonStyle.DANGER));
             list.add(Button.primary("rivalstickets_assign", Config.ASSIGN_BUTTON_NAME).withStyle(ButtonStyle.PRIMARY));
@@ -49,6 +49,7 @@ public class CreateModalListener extends ListenerAdapter {
                 } else {
                     emoji2 = Emoji.fromUnicode(emoji.getString("unicode"));
                 }
+
 
                 menu.addOption(section1.getString("name"), section1.getString("id"), emoji2);
             }

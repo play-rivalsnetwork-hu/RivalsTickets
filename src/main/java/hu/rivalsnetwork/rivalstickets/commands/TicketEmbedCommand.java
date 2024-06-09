@@ -18,7 +18,7 @@ public class TicketEmbedCommand extends ListenerAdapter {
         if (!event.getName().equals("ticketembed")) return;
 
         List<Button> buttons = new ArrayList<>(1);
-        buttons.add(Button.primary("rivalstickets_open", Config.CREATE_BUTTON_TEXT));
+        buttons.add(Button.danger("rivalstickets_open", Config.CREATE_BUTTON_TEXT));
         event.getChannel().sendMessageEmbeds(mainEmbed()).setActionRow(buttons).queue();
     }
 

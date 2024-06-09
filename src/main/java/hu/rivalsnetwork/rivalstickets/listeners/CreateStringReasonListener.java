@@ -15,6 +15,7 @@ import org.simpleyaml.configuration.ConfigurationSection;
 
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 
 public class CreateStringReasonListener extends ListenerAdapter {
 
@@ -32,10 +33,18 @@ public class CreateStringReasonListener extends ListenerAdapter {
             if (!Config.ROLE_TO_PING.isBlank()) {
                 action.addContent(Main.getGuild().getRoleById(Config.ROLE_TO_PING).getAsMention());
             }
+
             action.queue();
             event.getMessage().delete().queue();
-            event.getChannel().asTextChannel().getManager().putMemberPermissionOverride(event.getUser().getIdLong(), EnumSet.of(Permission.MESSAGE_SEND, Permission.VIEW_CHANNEL), null).queue();
             event.getChannel().asTextChannel().getManager().setParent(Main.getGuild().getCategoryById(section.getString("categoryid"))).queue();
+            event.getChannel().asTextChannel().getManager().putMemberPermissionOverride(event.getUser().getIdLong(), EnumSet.of(Permission.MESSAGE_SEND, Permission.VIEW_CHANNEL), null).queue();
+
+            List<String> cantSeeGroups = section.getStringList("cant-see-groups");
+            if (cantSeeGroups != null) {
+                for (String id : cantSeeGroups) {
+                    event.getChannel().asTextChannel().getManager().putRolePermissionOverride(Main.getGuild().getRoleById(id).getIdLong(), null, EnumSet.of(Permission.VIEW_CHANNEL)).queue();
+                }
+            }
             return;
         }
 

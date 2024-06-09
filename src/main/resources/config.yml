@@ -1,6 +1,8 @@
 categories:
   report:
     categoryid: 1060952978615455804
+    cant-see-groups:
+      - "696429954816016435"
     child:
       - "mute-player"
     name: "Játékos jelentés"

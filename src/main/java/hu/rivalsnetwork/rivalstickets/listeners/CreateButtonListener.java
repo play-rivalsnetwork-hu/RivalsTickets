@@ -32,11 +32,20 @@ public class CreateButtonListener extends ListenerAdapter {
 
         String nickName = event.getMember().getNickname();
 
-        TextInput userName = TextInput.create("username", "Játékosnév", TextInputStyle.SHORT)
-                .setRequiredRange(3, 16)
-                .setValue(nickName == null ? "Játékosneved" : nickName)
-                .setRequired(true)
-                .build();
+        TextInput userName;
+
+        if (nickName == null) {
+            userName = TextInput.create("username", "Játékosnév", TextInputStyle.SHORT)
+                    .setRequiredRange(3, 16)
+                    .setRequired(true)
+                    .build();
+        } else {
+            userName = TextInput.create("username", "Játékosnév", TextInputStyle.SHORT)
+                    .setRequiredRange(3, 16)
+                    .setValue(nickName)
+                    .setRequired(true)
+                    .build();
+        }
 
         TextInput description = TextInput.create("ticket_description", Config.DESCRIPTION, TextInputStyle.PARAGRAPH)
                 .setRequired(true)
