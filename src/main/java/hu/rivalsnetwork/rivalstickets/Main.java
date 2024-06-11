@@ -48,7 +48,7 @@ public class Main {
         Storage.reload();
 
         jda.upsertCommand("ticketembed", "Ticket embed message").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).queue();
-        jda.upsertCommand("tickettoplist", "Staff info command").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).addOption(OptionType.INTEGER, "time", "Idő").queue();
+        jda.upsertCommand("tickettoplist", "Staff info command").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MENTION_EVERYONE)).addOption(OptionType.INTEGER, "time", "Idő").queue();
         jda.upsertCommand("assign", "Assign a staff to a ticket").addOption(OptionType.USER, "assignee", "A hozzácsatolt staff").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
         jda.upsertCommand("unassign", "Remove an assignee from the ticket").addOption(OptionType.USER, "assignee", "A staff akit elvegyünk").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
         jda.upsertCommand("getassignee", "Get the currently assigned person").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
