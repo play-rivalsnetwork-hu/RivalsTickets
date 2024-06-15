@@ -46,6 +46,13 @@ public class CreateStringReasonListener extends ListenerAdapter {
                 }
             }
 
+            List<String> canSeeGroups = section.getStringList("can-see-groups");
+            if (canSeeGroups != null) {
+                for (String id : canSeeGroups) {
+                    manager.putRolePermissionOverride(Main.getGuild().getRoleById(id).getIdLong(),  EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND), null);
+                }
+            }
+
             manager.putMemberPermissionOverride(event.getUser().getIdLong(), EnumSet.of(Permission.MESSAGE_SEND, Permission.VIEW_CHANNEL), null).queue();
             return;
         }
