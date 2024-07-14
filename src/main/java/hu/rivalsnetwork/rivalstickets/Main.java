@@ -5,7 +5,7 @@ import hu.rivalsnetwork.rivalstickets.commands.TicketEmbedCommand;
 import hu.rivalsnetwork.rivalstickets.commands.TicketGetAssignedCommand;
 import hu.rivalsnetwork.rivalstickets.commands.TicketGetAssignedTicketsCommand;
 import hu.rivalsnetwork.rivalstickets.commands.TicketListCommand;
-import hu.rivalsnetwork.rivalstickets.commands.TicketStaffInfoCommand;
+import hu.rivalsnetwork.rivalstickets.commands.TicketTopListCommand;
 import hu.rivalsnetwork.rivalstickets.commands.TicketUnAssignCommand;
 import hu.rivalsnetwork.rivalstickets.configuration.Config;
 import hu.rivalsnetwork.rivalstickets.listeners.AssignButtonListener;
@@ -54,7 +54,7 @@ public class Main {
         jda.upsertCommand("getassignee", "Get the currently assigned person").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
         jda.upsertCommand("tickets", "Get the tickets that are assigned to you").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
         jda.upsertCommand("ticketlist", "Get the amount of open tickets").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MANAGE)).queue();
-        jda.addEventListener(new TicketEmbedCommand(), new CreateButtonListener(), new CreateModalListener(), new CreateStringReasonListener(), new CloseButtonListener(), new CloseModalListener(), /*new MessageSendListener(),*/ new TicketStaffInfoCommand(), new TicketAssignCommand(), new TicketGetAssignedTicketsCommand(), new TicketGetAssignedCommand(), new TicketUnAssignCommand(), new AssignButtonListener(), new ReviewMessageListener(), new TicketListCommand());
+        jda.addEventListener(new TicketEmbedCommand(), new CreateButtonListener(), new CreateModalListener(), new CreateStringReasonListener(), new CloseButtonListener(), new CloseModalListener(), /*new MessageSendListener(),*/ new TicketTopListCommand(), new TicketAssignCommand(), new TicketGetAssignedTicketsCommand(), new TicketGetAssignedCommand(), new TicketUnAssignCommand(), new AssignButtonListener(), new ReviewMessageListener(), new TicketListCommand());
     }
 
     public static File getDataFolder() {

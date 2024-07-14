@@ -4,16 +4,21 @@ import hu.rivalsnetwork.rivalstickets.Main;
 import hu.rivalsnetwork.rivalstickets.utils.FileUtils;
 
 import java.nio.file.Path;
+import java.util.List;
 
 public class Config extends AbstractConfig {
     @Key("database.address")
     public static String ADDRESS = "";
     @Key("database.database")
     public static String DATABASE = "";
+    @Key("database.auth-database")
+    public static String AUTH_DATABASE = "";
     @Key("database.username")
     public static String USERNAME = "";
     @Key("database.password")
     public static String PASSWORD = "";
+    @Key("tickettoplist-allowed")
+    public static List<String> TICKETTOPLIST_ALLOWED = List.of();
     @Key("embed.create.title")
     public static String CREATE_TITLE = "**Hibajegy**";
     @Key("embed.create.field.title")

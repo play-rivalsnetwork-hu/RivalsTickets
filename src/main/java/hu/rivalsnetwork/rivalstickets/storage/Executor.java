@@ -32,8 +32,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -100,7 +102,7 @@ public class Executor {
             if (user != null) {
                 user.openPrivateChannel().flatMap(privateChannel -> privateChannel.sendMessageEmbeds(closeEmbed(closer, reason, channel))).queue(null, new ErrorHandler().ignore(ErrorResponse.CANNOT_SEND_TO_USER));
             }
-        } catch (Exception exception) {
+        } catch (IOException exception) {
             log.error("There was an issue while getting inputstream for transcript!", exception);
         }
     }

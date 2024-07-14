@@ -7,9 +7,11 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import org.jetbrains.annotations.NotNull;
 import org.simpleyaml.configuration.ConfigurationSection;
@@ -37,7 +39,9 @@ public class CreateStringReasonListener extends ListenerAdapter {
 
             action.queue();
             event.getMessage().delete().queue();
-            event.getChannel().asTextChannel().getManager().setParent(Main.getGuild().getCategoryById(section.getString("categoryid"))).queue();
+            event.getChannel().asTextChannel().getManager().setParent(Main.getGuild().getCategoryById(section.getString("categoryid"))).queue(null, throwable -> {
+                Main.getGuild().getTextChannelById(747510372935794789L).sendMessage("Héka', staffok! Mozogjatok mert megtelt a(z) %s kategória! Aki nem mozog az el lesz verve a csapatvezetők által!".formatted(Main.getGuild().getCategoryById(section.getString("categoryid")).getName())).queue();
+            });
             TextChannelManager manager = event.getChannel().asTextChannel().getManager();
             List<String> cantSeeGroups = section.getStringList("cant-see-groups");
             if (cantSeeGroups != null) {

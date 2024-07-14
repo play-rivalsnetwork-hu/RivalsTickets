@@ -36,7 +36,7 @@ public class TicketListCommand extends ListenerAdapter {
         builder.setColor(Config.CURRENTLY_OPEN_TICKETS_COLOR);
         builder.setTitle(Config.CURRENTLY_OPEN_TICKETS_TITLE);
         builder.setFooter(Config.CURRENTLY_OPEN_TICKETS_FOOTER.replace("$amount", String.valueOf(i)));
-        HashMap<String, Integer> sorted = TicketStaffInfoCommand.sortByValue(openTickets);
+        HashMap<String, Integer> sorted = TicketTopListCommand.sortByValue(openTickets);
 
         sorted.forEach((key, value) -> {
             builder.addField(new MessageEmbed.Field(Config.CURRENTLY_OPEN_TICKETS_FIELD_TITLE.replace("$category", key).replace("$amount", String.valueOf(value)), Config.CURRENTLY_OPEN_TICKETS_FIELD_CONTENT.replace("$category", key).replace("$amount", String.valueOf(value)), true));

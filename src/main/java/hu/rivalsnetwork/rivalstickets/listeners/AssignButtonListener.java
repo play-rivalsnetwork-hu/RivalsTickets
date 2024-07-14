@@ -4,7 +4,9 @@ import hu.rivalsnetwork.rivalstickets.configuration.Config;
 import hu.rivalsnetwork.rivalstickets.storage.Executor;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 
 public class AssignButtonListener extends ListenerAdapter {

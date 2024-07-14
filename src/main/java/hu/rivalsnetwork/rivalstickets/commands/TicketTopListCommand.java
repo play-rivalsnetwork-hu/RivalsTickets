@@ -3,14 +3,19 @@ package hu.rivalsnetwork.rivalstickets.commands;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
+import hu.rivalsnetwork.rivalstickets.Main;
 import hu.rivalsnetwork.rivalstickets.configuration.Config;
 import hu.rivalsnetwork.rivalstickets.storage.Storage;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -24,11 +29,18 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
-public class TicketStaffInfoCommand extends ListenerAdapter {
+public class TicketTopListCommand extends ListenerAdapter {
+    private static final Logger log = LoggerFactory.getLogger(TicketTopListCommand.class);
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!event.getName().equals("tickettoplist")) return;
+        event.deferReply(true).queue();
+        if (!event.getMember().hasPermission(Permission.MESSAGE_MENTION_EVERYONE)) {
+            event.reply("Nincs jogod ehhez!").queue();
+            return;
+        }
+
         int time = event.getOption("time") == null ? 7 : event.getOption("time").getAsInt();
         Date date = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Europe/Budapest"))).getTime();
         Date secondDate = Date.from(Instant.now().minus(Duration.ofDays(time)));
@@ -44,8 +56,17 @@ public class TicketStaffInfoCommand extends ListenerAdapter {
             FindIterable<Document> cursor = collection.find(search);
             try (final MongoCursor<Document> iterator = cursor.cursor()) {
                 while (iterator.hasNext()) {
-                    String key = iterator.next().getString("closer-formatted-discord-name");
-                    userMap.put(key, userMap.getOrDefault(key, 0) + 1);
+                    Document document = iterator.next();
+                    String key = document.getString("closer");
+                    String memberName;
+                    Member member = Main.getGuild().getMemberById(key);
+                    if (member == null) {
+                        memberName = document.getString("closer-formatted-discord-name");
+                    } else {
+                        memberName = member.getEffectiveName();
+                    }
+
+                    userMap.put(memberName, userMap.getOrDefault(memberName, 0) + 1);
                 }
 
                 staffInfoEmbed(sortByValue(userMap), event, secondDate);

@@ -21,7 +21,7 @@ public class Storage {
 
     public static void reload() {
         ServerAddress address = new ServerAddress(Config.ADDRESS, 27017);
-        MongoCredential credential = MongoCredential.createCredential(Config.USERNAME, Config.DATABASE, Config.PASSWORD.toCharArray());
+        MongoCredential credential = MongoCredential.createCredential(Config.USERNAME, Config.AUTH_DATABASE, Config.PASSWORD.toCharArray());
         MongoClientSettings settings = MongoClientSettings.builder()
                 .uuidRepresentation(UuidRepresentation.JAVA_LEGACY)
                 .credential(credential)
