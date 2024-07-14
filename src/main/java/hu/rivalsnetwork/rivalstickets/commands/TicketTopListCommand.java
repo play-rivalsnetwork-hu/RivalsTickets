@@ -14,8 +14,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -30,12 +28,10 @@ import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 public class TicketTopListCommand extends ListenerAdapter {
-    private static final Logger log = LoggerFactory.getLogger(TicketTopListCommand.class);
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!event.getName().equals("tickettoplist")) return;
-        event.deferReply(true).queue();
         if (!event.getMember().hasPermission(Permission.MESSAGE_MENTION_EVERYONE)) {
             event.reply("Nincs jogod ehhez!").queue();
             return;
