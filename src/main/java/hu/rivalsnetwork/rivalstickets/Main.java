@@ -15,6 +15,7 @@ import hu.rivalsnetwork.rivalstickets.listeners.CreateButtonListener;
 import hu.rivalsnetwork.rivalstickets.listeners.CreateModalListener;
 import hu.rivalsnetwork.rivalstickets.listeners.CreateStringReasonListener;
 import hu.rivalsnetwork.rivalstickets.listeners.ReviewMessageListener;
+import hu.rivalsnetwork.rivalstickets.storage.Executor;
 import hu.rivalsnetwork.rivalstickets.storage.Storage;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -46,6 +47,7 @@ public class Main {
 
         Config.reload();
         Storage.reload();
+        Executor.cleanupTranscripts();
 
         jda.upsertCommand("ticketembed", "Ticket embed message").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)).queue();
         jda.upsertCommand("tickettoplist", "Staff info command").setGuildOnly(true).setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MESSAGE_MENTION_EVERYONE)).addOption(OptionType.INTEGER, "time", "Idő").queue();

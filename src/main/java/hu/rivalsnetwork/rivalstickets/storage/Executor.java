@@ -7,6 +7,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
+import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.UpdateOptions;
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -85,9 +87,43 @@ public class Executor {
         });
     }
 
+    public static void cleanupTranscripts() {
+        if (Config.TRANSCRIPT_RETENTION_DAYS <= 0) {
+            return;
+        }
+
+        Storage.mongo(database -> {
+            log.info("Starting cleanup...");
+            int transcripts = 0;
+            Date secondDate = Date.from(Instant.now().minus(Duration.ofDays(Config.TRANSCRIPT_RETENTION_DAYS)));
+            MongoCollection<Document> collection = database.getCollection("rivals_tickets_tickets");
+            Document search = new Document();
+            Document doc2 = new Document();
+            doc2.put("$lte", secondDate);
+            search.put("close-time", doc2);
+            FindIterable<Document> cursor = collection.find(search);
+            try (final MongoCursor<Document> iterator = cursor.cursor()) {
+                while (iterator.hasNext()) {
+                    Document document = iterator.next();
+                    String channelId = document.getString("channel_id");
+                    GridFSBucket bucket = GridFSBuckets.create(database, "rivals_tickets_transcripts");
+                    GridFSFile file = bucket.find(Filters.eq("filename", channelId)).first();
+                    if (file == null) {
+                        continue;
+                    }
+
+                    transcripts++;
+                    bucket.delete(file.getObjectId());
+                }
+            }
+            log.info("Cleanup finished, deleted {} transcripts!", transcripts);
+        });
+    }
+
     public static void deleteTicket(@NotNull Member closer, @NotNull TextChannel channel, @NotNull String reason)  {
         if (!isTicket(channel)) return;
         ticketChannels.invalidate(channel.getId());
+        cleanupTranscripts();
         DiscordHtmlTranscripts transcript = DiscordHtmlTranscripts.getInstance();
 
         try (InputStream stream = transcript.generateFromMessages(channel.getIterableHistory().stream().collect(Collectors.toList()))) {

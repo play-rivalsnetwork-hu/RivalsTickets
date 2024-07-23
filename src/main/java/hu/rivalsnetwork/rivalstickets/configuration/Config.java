@@ -148,6 +148,8 @@ public class Config extends AbstractConfig {
     public static String DESCRIPTION = "Kérlek, írd le röviden a problémádat!";
     @Key("transcript-dns")
     public static String TRANSCRIPT_DNS = "https://tickets.rivalsnetwork.hu/";
+    @Key("transcript-retention-days")
+    public static int TRANSCRIPT_RETENTION_DAYS = 30;
 
     public static final Config CONFIG = new Config();
 
